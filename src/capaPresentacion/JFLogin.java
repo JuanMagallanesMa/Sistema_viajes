@@ -4,6 +4,9 @@
  */
 package capaPresentacion;
 
+import capaNegocio.Controlador;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Juan magallanes
@@ -96,9 +99,17 @@ public class JFLogin extends javax.swing.JFrame {
 
     private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
         // TODO add your handling code here:
+        Controlador con = new Controlador();
         JFPrincipal principal = new JFPrincipal();
-        principal.setVisible(true); // Muestra el nuevo JFrame
-        this.dispose(); // Cierra el actual (opcional)
+          boolean loginExitoso = con.Login(txtUsuario.getText(), txtClave.getText());
+
+        if (loginExitoso) {
+            principal.setVisible(true);
+                this.setVisible(false);
+        } else {
+            JOptionPane.showMessageDialog(null, "Acceso denegado. Verifica tus credenciales.", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }//GEN-LAST:event_btnIniciarActionPerformed
 
     /**

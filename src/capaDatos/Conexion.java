@@ -14,7 +14,7 @@ public class Conexion {
       public static Connection getConexion() {
         String conUrl = "jdbc:postgresql://localhost/sistema_de_viajes";
         String usuario = "postgres";
-        String contra = "casa1234";
+        String contra = "12345";
 
         try {
             Connection con = DriverManager.getConnection(conUrl, usuario, contra);
