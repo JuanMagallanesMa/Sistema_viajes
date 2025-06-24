@@ -18,30 +18,45 @@ import javax.swing.JOptionPane;
 
 public class Controlador {
 
-    public boolean Login(String usuario, String clave) {
-        String query = "SELECT * FROM vendedor WHERE usuario = ? AND contrasenia = ?";
+    public boolean Login(String usuarioIngresado, String claveIngresada) {
+    String queryLogin = "SELECT * FROM usuario WHERE nombre_usuario = ? AND contrasena = ?";
+    String queryCount = "SELECT COUNT(*) FROM usuario";
 
-        try (Connection con = getConexion(); PreparedStatement pst = con.prepareStatement(query)) {
+    try (Connection con = getConexion()) {
+        // Verificar si hay usuarios registrados en la base
+        try (Statement stmt = con.createStatement(); ResultSet rsCount = stmt.executeQuery(queryCount)) {
+            if (rsCount.next() && rsCount.getInt(1) == 0) {
+                // Si no hay usuarios registrados, permitir solo admin por defecto
+                if (usuarioIngresado.equals("admin") && claveIngresada.equals("12345")) {
+                    JOptionPane.showMessageDialog(null, "BIENVENIDO USUARIO POR DEFECTO (admin)", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
+                    return true;
+                } else {
+                    JOptionPane.showMessageDialog(null, "No hay usuarios registrados. Use el usuario por defecto: admin / 12345", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
+        }
 
-            // Establecer los parámetros de la consulta
-            pst.setString(1, usuario);
-            pst.setString(2, clave);
-
-            // Ejecutar la consulta
+        // Si hay registros, proceder con la validación normal
+        try (PreparedStatement pst = con.prepareStatement(queryLogin)) {
+            pst.setString(1, usuarioIngresado);
+            pst.setString(2, claveIngresada);
             ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
-                JOptionPane.showMessageDialog(null, "BIENVENIDOS A SU SISTEMA", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "BIENVENIDO " + rs.getString("nombre_completo"), "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
                 return true;
             } else {
                 JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-            return false;
         }
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        return false;
     }
+}
+
 
     public void InsertarCliente(Cliente cli) {
         try {
