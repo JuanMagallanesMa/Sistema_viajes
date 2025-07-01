@@ -16,6 +16,7 @@ public class JPUsuario extends javax.swing.JPanel {
     JPCreateUsuario crear = new JPCreateUsuario();
     JPDeleteUsuario eliminar = new JPDeleteUsuario();
     JPEditUsuario editar = new JPEditUsuario();
+    JPReporteUsuario reporte = new JPReporteUsuario();
     /**
      * Creates new form JPUsuario
      */
@@ -155,7 +156,13 @@ public class JPUsuario extends javax.swing.JPanel {
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
-        // TODO add your handling code here:
+        panelContenedor.removeAll();
+        
+        panelContenedor.setLayout(new BorderLayout());
+        panelContenedor.add(reporte, BorderLayout.CENTER);
+        
+        panelContenedor.revalidate();
+        panelContenedor.repaint();
     }//GEN-LAST:event_btnReporteActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed

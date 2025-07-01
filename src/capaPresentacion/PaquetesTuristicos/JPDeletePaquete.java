@@ -5,18 +5,35 @@
 package capaPresentacion.PaquetesTuristicos;
 
 import capaPresentacion.Usuario.*;
+import javax.swing.JOptionPane;
+import entidades.PaqueteTuristico;
+import capaNegocio.Controlador;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.SpinnerDateModel;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  *
  * @author Juan magallanes
  */
 public class JPDeletePaquete extends javax.swing.JPanel {
-
+    
+    Controlador controlador = new Controlador();
     /**
      * Creates new form JPCreate
      */
     public JPDeletePaquete() {
         initComponents();
+        cargarPaises();
+        cargarHospedajes();
+        cargarActividades();
+        cargarTransportes() ;
     }
 
     /**
@@ -162,6 +179,11 @@ public class JPDeletePaquete extends javax.swing.JPanel {
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setBorder(null);
         btnLimpiar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         cmbActividades.setBorder(javax.swing.BorderFactory.createTitledBorder("Actividades"));
         cmbActividades.setMinimumSize(new java.awt.Dimension(64, 39));
@@ -245,6 +267,12 @@ public class JPDeletePaquete extends javax.swing.JPanel {
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
 
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         txtBusqueda.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
         txtBusqueda.setMinimumSize(new java.awt.Dimension(200, 50));
         txtBusqueda.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -291,9 +319,139 @@ public class JPDeletePaquete extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    
+    private void cargarPaises() {
+        String[] paises = {"Ecuador", "Perú", "México"};
+
+        
+        cmbDestino.removeAllItems();
+
+        for (String pais : paises) {
+            
+            cmbDestino.addItem(pais);
+        }
+    }
+    
+    private void cargarActividades() {
+    cmbActividades.removeAllItems();
+    cmbActividades.addItem("Tour histórico");
+    cmbActividades.addItem("Caminata ecológica");
+    cmbActividades.addItem("Snorkel");
+    cmbActividades.addItem("Escalada");
+    cmbActividades.addItem("Tour gastronómico");
+}
+
+private void cargarTransportes() {
+    
+    List<String> transportes = controlador.obtenerTransportesDisponibles();
+
+    cmbTransporte.removeAllItems();
+    for (String t : transportes) {
+        cmbTransporte.addItem(t);
+    }
+}
+    
+
+private Map<String, Double> preciosHospedaje = new HashMap<>();
+private void cargarHospedajes() {
+    preciosHospedaje.clear();
+    cmbHospedaje.removeAllItems();
+
+    preciosHospedaje.put("Hotel 3 estrellas", 50.0);
+    preciosHospedaje.put("Hotel 5 estrellas", 120.0);
+    preciosHospedaje.put("Hostal", 30.0);
+    preciosHospedaje.put("Cabaña", 70.0);
+    preciosHospedaje.put("Resort", 150.0);
+
+    for (String nombre : preciosHospedaje.keySet()) {
+        cmbHospedaje.addItem(nombre);
+    }
+}
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
+        String nombre = txtNombre.getText().trim();
+    if (nombre.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Ingrese el nombre del paquete a eliminar", "AVISO", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int confirm = JOptionPane.showConfirmDialog(null, "¿Está seguro de eliminar este paquete?", "CONFIRMAR", JOptionPane.YES_NO_OPTION);
+    if (confirm == JOptionPane.YES_OPTION) {
+        controlador.eliminarPaqueteTuristico(nombre);
+    }
+    limpiarFormulario() ;
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        
+         String nombre = txtBusqueda.getText().trim();
+    if (nombre.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Ingrese el nombre del paquete para buscar", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    PaqueteTuristico paquete = controlador.buscarPaquetePorNombre(nombre);
+    if (paquete != null) {
+        txtNombre.setText(paquete.getNombrePaquete());
+        cmbDestino.setSelectedItem(paquete.getDestino());
+        txtPrecio.setText(String.valueOf(paquete.getPrecioDestino()));
+        cmbHospedaje.setSelectedItem(paquete.getHospedaje());
+        cmbTransporte.setSelectedItem(paquete.getTransportePlaca());
+        cmbActividades.setSelectedItem(paquete.getActividades());
+        spinDuracion.setValue(paquete.getDuracionDias());
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+    String fechaOriginal = paquete.getFechaInicio(); // "Mon Jun 30 22:59:16 ECT 2025"
+    
+    // Parsear la fecha con formato y locale inglés
+    SimpleDateFormat sdfEntrada = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+    Date fechaParseada = (Date) sdfEntrada.parse(fechaOriginal);
+    
+    // Asignar la fecha al JSpinner
+    spinFechaInicio.setValue(fechaParseada);
+    
+    // Igual para fecha fin:
+    fechaOriginal = paquete.getFechaFin();
+    Date fechaFinParseada = (Date) sdfEntrada.parse(fechaOriginal);
+    spinFechaFin.setValue(fechaFinParseada);
+    
+} catch (ParseException e) {
+    e.printStackTrace();
+    JOptionPane.showMessageDialog(null, "Error al convertir fechas", "ERROR", JOptionPane.ERROR_MESSAGE);
+}
+
+
+
+    txtPrecioTotal.setText(String.valueOf(paquete.getPrecioTotal()));
+        
+    } else {
+        JOptionPane.showMessageDialog(null, "Paquete no encontrado", "AVISO", JOptionPane.WARNING_MESSAGE);
+    }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // TODO add your handling code here:
+        limpiarFormulario() ;
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+private void limpiarFormulario() {
+    txtNombre.setText("");
+    cmbDestino.setSelectedIndex(-1);
+    txtPrecio.setText("");
+    cmbHospedaje.setSelectedIndex(-1);
+    cmbTransporte.setSelectedIndex(-1);
+    cmbActividades.setSelectedIndex(-1);
+    spinDuracion.setValue(1); // o el valor por defecto que uses
+    txtPrecioTotal.setText("");
+
+    // Si los spinners tienen modelos de fecha
+    spinFechaInicio.setValue(new java.util.Date());
+    spinFechaFin.setValue(new java.util.Date());
+
+    txtBusqueda.setText("");
+}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

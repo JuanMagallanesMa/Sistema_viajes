@@ -4,12 +4,16 @@
  */
 package capaPresentacion.Usuario;
 
+import capaNegocio.Controlador;
+import entidades.Usuario;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Juan magallanes
  */
 public class JPDeleteUsuario extends javax.swing.JPanel {
-
+    private int idUsuario = -1;
     /**
      * Creates new form JPDeleteUsuario
      */
@@ -177,6 +181,12 @@ public class JPDeleteUsuario extends javax.swing.JPanel {
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
 
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         txtBusqueda.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
         txtBusqueda.setMinimumSize(new java.awt.Dimension(200, 50));
         txtBusqueda.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -245,12 +255,69 @@ public class JPDeleteUsuario extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        // TODO add your handling code here:
+        eliminarUsuarioActual();// TODO add your handling code here:
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void cmbRolesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbRolesActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbRolesActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        buscarUsuarioPorCedula();// TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+private void buscarUsuarioPorCedula() {
+    String cedula = txtBusqueda.getText().trim();
+    if (cedula.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese una cédula para buscar.");
+        return;
+    }
+
+    Controlador controlador = new Controlador();
+    Usuario user = controlador.obtenerUsuarioPorCedula(cedula);
+
+    if (user != null) {
+        idUsuario = user.getId();
+        txtCedula.setText(user.getCedula());
+        txtNombresCompletos.setText(user.getNombreCompleto());
+        txtCorreoElectronico.setText(user.getCorreoElectronico());
+        txtTelefono.setText(user.getTelefono());
+        txtDireccion.setText(user.getDireccion());
+        txtUsuario.setText(user.getNombreUsuario());
+        txtContrasena.setText(user.getContrasena());
+        cmbRoles.setSelectedItem(user.getRol());
+    } else {
+        JOptionPane.showMessageDialog(this, "Usuario no encontrado con esa cédula.");
+    }
+}
+private void limpiarCampos() {
+    txtCedula.setText("");
+    txtNombresCompletos.setText("");
+    txtCorreoElectronico.setText("");
+    txtTelefono.setText("");
+    txtDireccion.setText("");
+    txtUsuario.setText("");
+    txtContrasena.setText("");
+    cmbRoles.setSelectedIndex(0);
+    idUsuario = -1;
+}
+
+private void eliminarUsuarioActual() {
+    if (idUsuario == -1) {
+        JOptionPane.showMessageDialog(this, "Primero debe buscar un usuario para eliminar.");
+        return;
+    }
+
+    int confirm = JOptionPane.showConfirmDialog(this,
+            "¿Está seguro de marcar como inactivo este usuario?", "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION);
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        Controlador controlador = new Controlador();
+        controlador.eliminarUsuario(idUsuario);
+        limpiarCampos(); // limpia el formulario luego
+    }
+}
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

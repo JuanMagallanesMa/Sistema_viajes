@@ -5,21 +5,28 @@
  */
 package capaPresentacion.Factura;
 
+import capaNegocio.Controlador;
 import capaPresentacion.Reserva.*;
 import capaPresentacion.PaquetesTuristicos.*;
 import capaPresentacion.Usuario.*;
+import entidades.Factura;
+import entidades.Reserva;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Juan magallanes
  */
 public class JPDeleteFactura extends javax.swing.JPanel {
-
+    Controlador controlador = new Controlador();
     /**
      * Creates new form JPCreate
      */
     public JPDeleteFactura() {
         initComponents();
+        agregarMetodo();
+        cargarReservas();
     }
 
     /**
@@ -50,7 +57,7 @@ public class JPDeleteFactura extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         lblRecargo = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        cmbReserva = new javax.swing.JComboBox<>();
+        cmbReserva = new javax.swing.JComboBox<Reserva>();
         jPanel6 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         txtBusqueda1 = new javax.swing.JTextField();
@@ -247,6 +254,12 @@ public class JPDeleteFactura extends javax.swing.JPanel {
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
 
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         txtBusqueda1.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
         txtBusqueda1.setMinimumSize(new java.awt.Dimension(200, 50));
         txtBusqueda1.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -297,15 +310,71 @@ public class JPDeleteFactura extends javax.swing.JPanel {
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
+        String idText = txtBusqueda1.getText().trim();
+    
+    if (idText.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Ingrese el ID de la factura a anular", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    try {
+        int facturaId = Integer.parseInt(idText);
+        controlador.AnularFactura(facturaId);
+        JOptionPane.showMessageDialog(null, "Factura anulada correctamente", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "El ID debe ser un número válido", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        try {
+        int idFactura = Integer.parseInt(txtBusqueda1.getText().trim());
+        Factura factura = controlador.obtenerFacturaPorId(idFactura);
+        if (factura != null) {
+            // Seleccionar reserva en el combo (asumiendo que el combo tiene objetos Reserva)
+            for (int i = 0; i < cmbReserva.getItemCount(); i++) {
+                Reserva r = (Reserva) cmbReserva.getItemAt(i);
+                if (r.getId() == factura.getReserva_id()) {
+                    cmbReserva.setSelectedIndex(i);
+                    break;
+                }
+            }
+
+            // Llenar los demás campos
+            cmbMetodoPago.setSelectedItem(factura.getMetodo());
+            lblSubtotal.setText(String.format("%.2f", factura.getSubTotal()));
+            lblIVA.setText(String.format("%.2f", factura.getIva()));
+            lblTotal.setText(String.format("%.2f", factura.getTotal()));
+            // Si tienes etiqueta para estado:
+            // lblEstado.setText(factura.getEstado());
+        } else {
+            JOptionPane.showMessageDialog(null, "Factura no encontrada", "INFO", JOptionPane.INFORMATION_MESSAGE);
+        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Ingrese un ID válido", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_jButton2ActionPerformed
+ArrayList<Reserva> reservas = controlador.obtenerReservasCmb();
+    private void cargarReservas() {
+        
+        cmbReserva.removeAllItems();
+        for (Reserva r : reservas) {
+            cmbReserva.addItem(r);
+        }
+        
+    }
+    void agregarMetodo(){
+        cmbMetodoPago.addItem("Efectivo");
+        cmbMetodoPago.addItem("Transferencia");
+        cmbMetodoPago.addItem("Tarjeta de Crédito");
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JComboBox<String> cmbMetodoPago;
-    private javax.swing.JComboBox<String> cmbReserva;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<Reserva> cmbReserva;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel3;
@@ -319,13 +388,11 @@ public class JPDeleteFactura extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JLabel lblIVA;
     private javax.swing.JLabel lblRecargo;
     private javax.swing.JLabel lblSubtotal;
     private javax.swing.JLabel lblTotal;
-    private javax.swing.JTextField txtBusqueda;
     private javax.swing.JTextField txtBusqueda1;
     // End of variables declaration//GEN-END:variables
 }

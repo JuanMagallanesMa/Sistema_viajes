@@ -5,20 +5,34 @@
  */
 package capaPresentacion.Reserva;
 
+import capaNegocio.Controlador;
 import capaPresentacion.PaquetesTuristicos.*;
 import capaPresentacion.Usuario.*;
+import entidades.Reserva;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.event.ChangeListener;
 
+import java.sql.Timestamp;
 /**
  *
  * @author Juan magallanes
  */
 public class JPCreateReserva extends javax.swing.JPanel {
-
+    Controlador controlador = new Controlador();
     /**
      * Creates new form JPCreate
      */
     public JPCreateReserva() {
         initComponents();
+        cargarPaises();
+        cargarPrecios();  
+        configurarEventos();
+        cargarClientes();
     }
 
     /**
@@ -115,9 +129,15 @@ public class JPCreateReserva extends javax.swing.JPanel {
         txtPrecioTotal.setMinimumSize(new java.awt.Dimension(200, 50));
         txtPrecioTotal.setPreferredSize(new java.awt.Dimension(200, 50));
 
+        cmbClase.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Económica", "Ejecutiva", "Primera" }));
         cmbClase.setBorder(javax.swing.BorderFactory.createTitledBorder("Clase"));
         cmbClase.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbClase.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbClase.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbClaseActionPerformed(evt);
+            }
+        });
 
         btnLimpiar.setBackground(new java.awt.Color(204, 204, 204));
         btnLimpiar.setText("Limpiar");
@@ -226,9 +246,109 @@ public class JPCreateReserva extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cargarPaises() {
+        String[] paises = {"Ecuador", "Perú", "México"};
+
+        cmbOrigen.removeAllItems();
+        cmbDestino.removeAllItems();
+
+        for (String pais : paises) {
+            cmbOrigen.addItem(pais);
+            cmbDestino.addItem(pais);
+        }
+    }
+    private Map<String, Double> tablaPrecios = new HashMap<>();
+
+    private void cargarPrecios() {
+        tablaPrecios.put("Ecuador-Perú", 200.0);
+        tablaPrecios.put("Ecuador-México", 400.0);
+        tablaPrecios.put("Perú-Ecuador", 200.0);
+        tablaPrecios.put("Perú-México", 350.0);
+        tablaPrecios.put("México-Ecuador", 400.0);
+        tablaPrecios.put("México-Perú", 350.0);
+    }
+    private void configurarEventos() {
+        ItemListener recalcular = e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                calcularPrecioTotal();
+            }
+        };
+
+        ChangeListener cambioPasajeros = e -> calcularPrecioTotal();
+
+        cmbOrigen.addItemListener(recalcular);
+        cmbDestino.addItemListener(recalcular);
+        spinDuracion.addChangeListener(cambioPasajeros);
+    }
+    private void calcularPrecioTotal() {
+        String origen = (String) cmbOrigen.getSelectedItem();
+        String destino = (String) cmbDestino.getSelectedItem();
+
+        if (origen == null || destino == null || origen.equals(destino)) {
+            txtPrecioTotal.setText("0.00");
+            return;
+        }
+
+        String claveRuta = origen + "-" + destino;
+
+        Double precioBase = tablaPrecios.get(claveRuta);
+        if (precioBase == null) {
+            txtPrecioTotal.setText("0.00");
+            return;
+        }
+
+        int cantidad = (Integer) spinDuracion.getValue();
+        double total = precioBase * cantidad;
+        txtPrecioTotal.setText(String.format("%.2f", total));
+    }
+    // Mapa donde guardarás el nombre y su ID
+    private Map<String, Integer> clientesMap = new HashMap<>();
+
+    private void cargarClientes() {
+        clientesMap = controlador.obtenerClientesConId();
+        cmbCliente.removeAllItems();
+
+        for (String nombre : clientesMap.keySet()) {
+            cmbCliente.addItem(nombre);
+        }
+    }
+
+
+   
+    
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+        Reserva r = new Reserva();
+
+    // Obtener nombre y buscar ID
+    String nombreSeleccionado = (String) cmbCliente.getSelectedItem();
+    int idCliente = clientesMap.get(nombreSeleccionado); // <-- clientesMap debe estar cargado
+
+    r.setCliente_id(idCliente);
+    r.setOrigen(cmbOrigen.getSelectedItem().toString());
+    r.setDestino(cmbDestino.getSelectedItem().toString());
+    r.setFecha_reserva(new Timestamp(System.currentTimeMillis()));
+
+    Date fechaViaje = (Date) spinFechaViaje.getValue();
+    r.setFecha_viaje(new Timestamp(fechaViaje.getTime()));
+
+    int pasajeros = (int) spinDuracion.getValue();
+    r.setCantidad_pasajeros(pasajeros);
+
+    r.setClase(cmbClase.getSelectedItem().toString());
+
+    double precioTotal = Double.parseDouble(txtPrecioTotal.getText().replace(",","."));
+    r.setPrecio_total(precioTotal);
+
+    r.setEstado("Pendiente"); // O cualquier estado por defecto
+
+    // Llamada al controlador
+    controlador.InsertarReserva(r);
+        
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void cmbClaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbClaseActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbClaseActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

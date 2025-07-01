@@ -3,7 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package capaPresentacion.Usuario;
-
+import capaNegocio.Controlador;
+import entidades.Usuario;
 /**
  *
  * @author Juan magallanes
@@ -135,6 +136,11 @@ public class JPCreateUsuario extends javax.swing.JPanel {
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setBorder(null);
         btnLimpiar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -218,9 +224,41 @@ public class JPCreateUsuario extends javax.swing.JPanel {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
+        guardarUsuario();
+        
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+limpiarCampos();        
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+private void guardarUsuario() {
+    Usuario user = new Usuario();
+    user.setCedula(txtCedula.getText().trim());
+    user.setNombreCompleto(txtNombresCompletos.getText().trim());
+    user.setCorreoElectronico(txtCorreoElectronico.getText().trim());
+    user.setTelefono(txtTelefono.getText().trim());
+    user.setDireccion(txtDireccion.getText().trim());
+    user.setRol((String) cmbRoles.getSelectedItem());
+    user.setNombreUsuario(txtUsuario.getText().trim());
+    user.setContrasena(txtContrasena.getText().trim());
+    user.setFechaRegistro(new java.sql.Timestamp(System.currentTimeMillis()));
+    user.setEstado("Activo"); // Puedes cambiarlo según tu lógica
 
+    Controlador controlador = new Controlador();
+    controlador.insertarUsuario(user);
+}
+
+private void limpiarCampos() {
+    txtCedula.setText("");
+    txtNombresCompletos.setText("");
+    txtCorreoElectronico.setText("");
+    txtTelefono.setText("");
+    txtDireccion.setText("");
+    txtUsuario.setText("");
+    txtContrasena.setText("");
+    cmbRoles.setSelectedIndex(0);
+}
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;

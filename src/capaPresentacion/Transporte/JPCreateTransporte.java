@@ -4,8 +4,10 @@
  */
 package capaPresentacion.Transporte;
 
+import capaNegocio.Controlador;
 import capaPresentacion.Usuario.*;
-
+import entidades.Transporte;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Juan magallanes
@@ -35,7 +37,6 @@ public class JPCreateTransporte extends javax.swing.JPanel {
         txtConsumoCombustible = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        cmbEstado = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         txtPlaca = new javax.swing.JTextField();
         txtAnioFabricacion = new javax.swing.JTextField();
@@ -75,11 +76,6 @@ public class JPCreateTransporte extends javax.swing.JPanel {
 
         jLabel1.setText("km");
 
-        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Activo", "Mantenimiento", "Inactivo" }));
-        cmbEstado.setBorder(javax.swing.BorderFactory.createTitledBorder("Estado"));
-        cmbEstado.setMinimumSize(new java.awt.Dimension(64, 39));
-        cmbEstado.setPreferredSize(new java.awt.Dimension(200, 50));
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -93,12 +89,9 @@ public class JPCreateTransporte extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1))
-                            .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -113,9 +106,7 @@ public class JPCreateTransporte extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addGap(18, 18, 18)
-                .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(86, 86, 86)
                 .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -130,6 +121,7 @@ public class JPCreateTransporte extends javax.swing.JPanel {
         txtAnioFabricacion.setMinimumSize(new java.awt.Dimension(200, 50));
         txtAnioFabricacion.setPreferredSize(new java.awt.Dimension(200, 50));
 
+        cmbTipoVehiculo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Bus", "Auto" }));
         cmbTipoVehiculo.setBorder(javax.swing.BorderFactory.createTitledBorder("Tipo de vehiculo"));
         cmbTipoVehiculo.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbTipoVehiculo.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -212,13 +204,31 @@ public class JPCreateTransporte extends javax.swing.JPanel {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
+        try {
+            Transporte transporte = new Transporte();
+
+            transporte.setPlaca(txtPlaca.getText());
+            transporte.setModeloVehiculo(txtModelo.getText());
+            transporte.setTipoVehiculo(cmbTipoVehiculo.getSelectedItem().toString());
+            transporte.setKilometraje(Integer.parseInt(txtKilometraje.getText()));
+            transporte.setAnioFabricacion(Integer.parseInt(txtAnioFabricacion.getText()));
+            transporte.setConsumoCombustiblePorKm(txtConsumoCombustible.getText());
+            transporte.setEstado(true);
+
+            Controlador controlador = new Controlador();
+            controlador.insertarTransporte(transporte);
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Error en formato numérico. Verifica los campos de kilometraje o año.", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al registrar el transporte: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
-    private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JComboBox<String> cmbTipoVehiculo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;

@@ -4,7 +4,13 @@
  */
 package capaPresentacion.PaquetesTuristicos;
 
-import capaPresentacion.Usuario.*;
+import capaNegocio.Controlador;
+import entidades.PaqueteTuristico;
+import java.awt.event.ItemEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,6 +23,14 @@ public class JPCreatePaquete extends javax.swing.JPanel {
      */
     public JPCreatePaquete() {
         initComponents();
+        cargarPaises();
+        cargarHospedajes();
+        cargarActividades();
+        cargarTransportes() ;
+        cmbHospedaje.addActionListener(e -> calcularPrecioTotal());
+        spinDuracion.addChangeListener((javax.swing.event.ChangeEvent evt) -> {
+            calcularPrecioTotal();
+        });
     }
 
     /**
@@ -75,12 +89,22 @@ public class JPCreatePaquete extends javax.swing.JPanel {
         cmbHospedaje.setBorder(javax.swing.BorderFactory.createTitledBorder("Hospedaje"));
         cmbHospedaje.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbHospedaje.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbHospedaje.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbHospedajeActionPerformed(evt);
+            }
+        });
 
         cmbTransporte.setBorder(javax.swing.BorderFactory.createTitledBorder("Transporte"));
         cmbTransporte.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbTransporte.setPreferredSize(new java.awt.Dimension(200, 50));
 
         spinDuracion.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
+        spinDuracion.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                spinDuracionStateChanged(evt);
+            }
+        });
 
         jLabel1.setText("Dias");
 
@@ -146,6 +170,11 @@ public class JPCreatePaquete extends javax.swing.JPanel {
         txtPrecioTotal.setBorder(javax.swing.BorderFactory.createTitledBorder("Precio total"));
         txtPrecioTotal.setMinimumSize(new java.awt.Dimension(200, 50));
         txtPrecioTotal.setPreferredSize(new java.awt.Dimension(200, 50));
+        txtPrecioTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPrecioTotalActionPerformed(evt);
+            }
+        });
 
         txtPrecio.setBorder(javax.swing.BorderFactory.createTitledBorder("Precio"));
         txtPrecio.setMinimumSize(new java.awt.Dimension(200, 50));
@@ -259,10 +288,151 @@ public class JPCreatePaquete extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+        guardarPaqueteTuristico() ;// TODO add your handling code here:
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    private void cmbHospedajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbHospedajeActionPerformed
+        // TODO add your handling code here:
+         String seleccionado = (String) cmbTransporte.getSelectedItem();
+if (seleccionado != null && seleccionado.contains(" - ")) {
+    String placa = seleccionado.split(" - ")[1];  // toma lo que está después del " - "
+    // usa esta 'placa' para guardar en la BD
+}
+    calcularPrecioTotal();
+    
+    }//GEN-LAST:event_cmbHospedajeActionPerformed
 
+    private void txtPrecioTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecioTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPrecioTotalActionPerformed
+
+    private void spinDuracionStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinDuracionStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_spinDuracionStateChanged
+    private void cargarPaises() {
+        String[] paises = {"Ecuador", "Perú", "México"};
+
+        
+        cmbDestino.removeAllItems();
+
+        for (String pais : paises) {
+            
+            cmbDestino.addItem(pais);
+        }
+    }
+    
+    
+    
+
+private Map<String, Double> preciosHospedaje = new HashMap<>();
+private void cargarHospedajes() {
+    preciosHospedaje.clear();
+    cmbHospedaje.removeAllItems();
+
+    preciosHospedaje.put("Hotel 3 estrellas", 50.0);
+    preciosHospedaje.put("Hotel 5 estrellas", 120.0);
+    preciosHospedaje.put("Hostal", 30.0);
+    preciosHospedaje.put("Cabaña", 70.0);
+    preciosHospedaje.put("Resort", 150.0);
+
+    for (String nombre : preciosHospedaje.keySet()) {
+        cmbHospedaje.addItem(nombre);
+    }
+}
+private void calcularPrecioTotal() {
+    String hospedajeSeleccionado = (String) cmbHospedaje.getSelectedItem();
+    if (hospedajeSeleccionado == null) {
+        System.out.println("No hay hospedaje seleccionado");
+        txtPrecio.setText("");
+        txtPrecioTotal.setText("");
+        return;
+    }
+    Double precio = preciosHospedaje.get(hospedajeSeleccionado);
+    System.out.println("Precio encontrado para hospedaje: " + precio);
+    if (precio == null) {
+        System.out.println("No se encontró precio para el hospedaje");
+        txtPrecio.setText("");
+        txtPrecioTotal.setText("");
+        return;
+    }
+    // Mostrar precio unitario en txtPrecio
+    txtPrecio.setText(String.format("%.2f", precio));
+
+    int duracion = (Integer) spinDuracion.getValue();
+    System.out.println("Duración: " + duracion);
+
+    // Calcular total y mostrar en txtPrecioTotal
+    double total = precio * duracion;
+    txtPrecioTotal.setText(String.format("%.2f", total));
+    System.out.println("Precio total seteado: " + total);
+} 
+
+private void cargarActividades() {
+    cmbActividades.removeAllItems();
+    cmbActividades.addItem("Tour histórico");
+    cmbActividades.addItem("Caminata ecológica");
+    cmbActividades.addItem("Snorkel");
+    cmbActividades.addItem("Escalada");
+    cmbActividades.addItem("Tour gastronómico");
+}
+
+private void cargarTransportes() {
+    Controlador controlador = new Controlador();
+    List<String> transportes = controlador.obtenerTransportesDisponibles();
+
+    cmbTransporte.removeAllItems();
+    for (String t : transportes) {
+        cmbTransporte.addItem(t);
+    }
+}
+
+private void guardarPaqueteTuristico() {
+    try {
+        String nombre = txtNombre.getText();
+        String destino = (String) cmbDestino.getSelectedItem();
+        String precioText = txtPrecio.getText().replace(",",".").trim();
+        String precioTotalText = txtPrecioTotal.getText().replace(",",".").trim();
+        int duracion = (Integer) spinDuracion.getValue();
+        String hospedaje = (String) cmbHospedaje.getSelectedItem();
+        String transporte = (String) cmbTransporte.getSelectedItem();
+        String actividades = (String) cmbActividades.getSelectedItem();
+        String fechaInicio = spinFechaInicio.getValue().toString();
+        String fechaFin = spinFechaFin.getValue().toString();
+
+        if (nombre.isEmpty() || destino == null || precioText.isEmpty() || precioTotalText.isEmpty() || hospedaje == null || transporte == null) {
+            JOptionPane.showMessageDialog(null, "Por favor complete todos los campos requeridos.");
+            return;
+        }
+
+        double precio = Double.parseDouble(precioText);
+        double precioTotal = Double.parseDouble(precioTotalText);
+
+        PaqueteTuristico paquete = new PaqueteTuristico();
+        paquete.setNombrePaquete(nombre);
+        paquete.setDestino(destino);
+        paquete.setPrecioDestino(precio);
+        paquete.setHospedaje(hospedaje);
+        paquete.setActividades(actividades);
+        paquete.setDuracionDias(duracion);
+
+        // Extraer solo la placa del transporte
+        String placaTransporte = null;
+        if (transporte.contains(" - ")) {
+            placaTransporte = transporte.split(" - ")[1];
+        }
+        paquete.setTransportePlaca(placaTransporte);
+
+        paquete.setFechaInicio(fechaInicio);
+        paquete.setFechaFin(fechaFin);
+        paquete.setPrecioTotal(precioTotal);
+
+        Controlador controlador = new Controlador();
+        controlador.insertarPaqueteTuristico(paquete, cmbTransporte);
+
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Precio o precio total inválido. Debe ingresar un número válido.");
+    }
+}
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;

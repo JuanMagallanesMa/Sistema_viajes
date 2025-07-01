@@ -13,7 +13,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JComboBox;
 
 
 public class Controlador {
@@ -57,7 +64,60 @@ public class Controlador {
     }
 }
 
+ public static ArrayList<Cliente> buscarClientes(String nombre, String cedula, Timestamp desde, Timestamp hasta) {
+        ArrayList<Cliente> lista = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM cliente WHERE 1=1");
 
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            sql.append(" AND LOWER(nombres_apellidos) LIKE ?");
+        }
+        if (cedula != null && !cedula.trim().isEmpty()) {
+            sql.append(" AND cedula LIKE ?");
+        }
+        if (desde != null) {
+            sql.append(" AND fecha_registro >= ?");
+        }
+        if (hasta != null) {
+            sql.append(" AND fecha_registro <= ?");
+        }
+
+        try (Connection con = getConexion();
+             PreparedStatement pst = con.prepareStatement(sql.toString())) {
+
+            int index = 1;
+
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                pst.setString(index++, "%" + nombre.toLowerCase() + "%");
+            }
+            if (cedula != null && !cedula.trim().isEmpty()) {
+                pst.setString(index++, "%" + cedula + "%");
+            }
+            if (desde != null) {
+                pst.setTimestamp(index++, desde);
+            }
+            if (hasta != null) {
+                pst.setTimestamp(index++, hasta);
+            }
+
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                Cliente c = new Cliente();
+                c.setId(rs.getInt("id"));
+                c.setNombres_apellidos(rs.getString("nombres_apellidos"));
+                c.setCorreoelectronico(rs.getString("correoelectronico"));
+                c.setDireccion(rs.getString("direccion"));
+                c.setTelefono(rs.getString("telefono"));
+                c.setCedula(rs.getString("cedula"));
+                c.setFecha_registro(rs.getTimestamp("fecha_registro"));
+                lista.add(c);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
     public void InsertarCliente(Cliente cli) {
         try {
             Connection cone = getConexion();
@@ -124,7 +184,77 @@ public class Controlador {
             System.out.println("Error al eliminar los datos");
         }
     }
+    
+    public Map<String, Integer> obtenerClientesConId() {
+        Map<String, Integer> clientes = new HashMap<>();
+        String sql = "SELECT id, nombres_apellidos FROM cliente";
 
+        try (Connection con = getConexion();
+             PreparedStatement pst = con.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                clientes.put(rs.getString("nombres_apellidos"), rs.getInt("id"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al obtener clientes con ID: " + e.getMessage());
+        }
+
+        return clientes;
+    }
+    public static ArrayList<Reserva> buscarReservas(String origen, String destino, String clase,
+                                                    String estado, Timestamp desde, Timestamp hasta) {
+        ArrayList<Reserva> lista = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT r.id, r.cliente_id, c.nombres_apellidos, r.origen, r.destino, r.clase, r.estado, " +
+            "r.cantidad_pasajeros, r.precio_total, r.fecha_reserva, r.fecha_viaje " +
+            "FROM reserva r JOIN cliente c ON r.cliente_id = c.id WHERE 1=1"
+        );
+
+        if (origen != null && !origen.isEmpty()) sql.append(" AND LOWER(r.origen) = LOWER(?)");
+        if (destino != null && !destino.isEmpty()) sql.append(" AND LOWER(r.destino) = LOWER(?)");
+        if (clase != null && !clase.isEmpty()) sql.append(" AND r.clase = ?");
+        if (estado != null && !estado.isEmpty()) sql.append(" AND r.estado = ?");
+        if (desde != null) sql.append(" AND r.fecha_viaje >= ?");
+        if (hasta != null) sql.append(" AND r.fecha_viaje <= ?");
+
+        try (Connection con = getConexion();
+             PreparedStatement pst = con.prepareStatement(sql.toString())) {
+
+            int idx = 1;
+
+            if (origen != null && !origen.isEmpty()) pst.setString(idx++, origen);
+            if (destino != null && !destino.isEmpty()) pst.setString(idx++, destino);
+            if (clase != null && !clase.isEmpty()) pst.setString(idx++, clase);
+            if (estado != null && !estado.isEmpty()) pst.setString(idx++, estado);
+            if (desde != null) pst.setTimestamp(idx++, desde);
+            if (hasta != null) pst.setTimestamp(idx++, hasta);
+
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Reserva r = new Reserva();
+                r.id = rs.getInt("id");
+                r.cliente_id = rs.getInt("cliente_id");
+                r.nombres_apellidos = rs.getString("nombres_apellidos");
+                r.origen = rs.getString("origen");
+                r.destino = rs.getString("destino");
+                r.clase = rs.getString("clase");
+                r.estado = rs.getString("estado");
+                r.cantidad_pasajeros = rs.getInt("cantidad_pasajeros");
+                r.precio_total = rs.getDouble("precio_total");
+                r.fecha_reserva = rs.getTimestamp("fecha_reserva");
+                r.fecha_viaje = rs.getTimestamp("fecha_viaje");
+                lista.add(r);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+    
     public void InsertarReserva(Reserva re) {
         try {
             Connection cone = getConexion();
@@ -134,7 +264,7 @@ public class Controlador {
             pst.setString(3, re.getOrigen());
             pst.setTimestamp(4, re.getFecha_reserva());
             pst.setTimestamp(5, re.getFecha_viaje());
-            pst.setDouble(6, re.getCantidad_pasajeros());
+            pst.setInt(6, re.getCantidad_pasajeros());
             pst.setString(7, re.getClase());
             pst.setDouble(8, re.getPrecio_total());
             pst.setString(9, re.getEstado());
@@ -152,7 +282,8 @@ public class Controlador {
         try {
             Connection cone = getConexion();
 
-            String sql = "UPDATE reserva SET cliente_id=?, destino=?, origen=?, fecha_reserva=?, fecha_viaje=?, cantidad_pasajeros=?, clase=?, precio_total=?, estado=? WHERE id=?";
+            String sql = "UPDATE reserva SET cliente_id=?, destino=?, origen=?, fecha_reserva=?, "
+                    + "fecha_viaje=?, cantidad_pasajeros=?, clase=?, precio_total=?, estado=? WHERE id=?";
             PreparedStatement pst = cone.prepareStatement(sql);
             pst.setInt(1, res.getCliente_id());
             pst.setString(2, res.getDestino());
@@ -176,26 +307,170 @@ public class Controlador {
             System.out.println("Error al modificar los datos");
         }
     }
-
-    public void EliminarReserva(int id) {
+    public void eliminarReservaLogica(int id) {
         try {
             Connection cone = getConexion();
-            String sql = "DELETE FROM reserva WHERE id=?";
+            String sql = "UPDATE reserva SET estado = ? WHERE id = ?";
             PreparedStatement pst = cone.prepareStatement(sql);
-            pst.setInt(1, id);
+            pst.setString(1, "Cancelada");  // O el estado que uses para marcar eliminado
+            pst.setInt(2, id);
 
             int affectedRows = pst.executeUpdate();
             if (affectedRows > 0) {
-                System.out.println("Registro eliminado correctamente");
+                System.out.println("Registro marcado como eliminado correctamente");
             } else {
-                System.out.println("No se encontró el registro para eliminar");
+                System.out.println("No se encontró el registro para marcar como eliminado");
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            System.out.println("Error al eliminar los datos");
+            System.out.println("Error al actualizar el estado de la reserva");
         }
     }
+    public List<Reserva> obtenerReservas() {
+    List<Reserva> lista = new ArrayList<>();
+    String sql = "SELECT r.id, c.nombres_apellidos, r.precio_total " +
+                 "FROM reserva r " +
+                 "JOIN cliente c ON r.cliente_id = c.id " +
+                 "WHERE r.estado = 'Confirmada'"; // si quieres filtrar solo confirmadas, opcional
+
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql);
+         ResultSet rs = pst.executeQuery()) {
+        while (rs.next()) {
+            Reserva r = new Reserva();
+            r.setId(rs.getInt("id"));
+            r.setNombres_apellidos(rs.getString("nombres_apellidos"));
+            r.setPrecio_total(rs.getDouble("precio_total"));
+            lista.add(r);
+        }
+    } catch (SQLException ex) {
+        System.out.println(ex.getMessage());
+        JOptionPane.showMessageDialog(null, "Error al obtener reservas", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+    return lista;
+}
     
+    public List<Reserva> obtenerReservasParaFactura() {
+    List<Reserva> lista = new ArrayList<>();
+    String sql = "SELECT r.id, r.precio_total, c.nombres_apellidos " +
+                 "FROM reserva r " +
+                 "JOIN cliente c ON r.cliente_id = c.id " +
+                 "WHERE r.estado = 'Confirmado'";  // puedes ajustar esta condición según lo que necesites
+
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql);
+         ResultSet rs = pst.executeQuery()) {
+
+        while (rs.next()) {
+            Reserva r = new Reserva();
+            r.id = rs.getInt("id");
+            r.precio_total = rs.getDouble("precio_total");
+            r.nombres_apellidos = rs.getString("nombres_apellidos");
+
+            lista.add(r);
+        }
+
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al obtener reservas", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+
+    return lista;
+}
+    
+    
+    
+    
+    
+    
+    public int buscarClienteIdPorNombre(String nombreCliente) {
+    int id = -1;
+    String sql = "SELECT id FROM cliente WHERE nombres_apellidos = ?";
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setString(1, nombreCliente);
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            id = rs.getInt("id");
+        }
+    } catch (SQLException ex) {
+        System.out.println("Error al obtener cliente_id: " + ex.getMessage());
+    }
+    return id;
+}
+
+    private final Map<String, Double> tablaPrecios = new HashMap<>();
+    
+    private void cargarPrecios() {
+        tablaPrecios.put("Ecuador-Perú", 200.0);
+        tablaPrecios.put("Ecuador-México", 400.0);
+        tablaPrecios.put("Perú-Ecuador", 200.0);
+        tablaPrecios.put("Perú-México", 350.0);
+        tablaPrecios.put("México-Ecuador", 400.0);
+        tablaPrecios.put("México-Perú", 350.0);
+    }
+    public double obtenerPrecio(String origen, String destino) {
+    if (tablaPrecios.isEmpty()) {
+        cargarPrecios(); // Se asegura de que esté cargado
+    }
+
+    String clave = origen + "-" + destino;
+    return tablaPrecios.getOrDefault(clave, 0.0);
+}
+   public ArrayList<Reserva> obtenerReservasCmb() {
+    ArrayList<Reserva> lista = new ArrayList<>();
+    String sql = "SELECT r.id, r.precio_total, c.nombres_apellidos FROM reserva r JOIN cliente c ON r.cliente_id = c.id WHERE r.estado = 'Pendiente'";
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql);
+         ResultSet rs = pst.executeQuery()) {
+        while (rs.next()) {
+            Reserva r = new Reserva();
+            r.setId(rs.getInt("id"));
+            r.setPrecio_total(rs.getDouble("precio_total"));  // ✅ aquí se carga correctamente
+            r.setNombres_apellidos(rs.getString("nombres_apellidos"));
+            lista.add(r);
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al obtener reservas: " + e.getMessage());
+    }
+    return lista;
+}
+    
+    
+    public Reserva obtenerReservaPorId(int id) {
+    Reserva r = null;
+
+    String sql = "SELECT r.*, c.nombres_apellidos FROM reserva r JOIN cliente c ON r.cliente_id = c.id WHERE r.id = ?";
+
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+
+        pst.setInt(1, id);
+        ResultSet rs = pst.executeQuery();
+
+        if (rs.next()) {
+            r = new Reserva();
+            r.setId(rs.getInt("id"));
+            r.setCliente_id(rs.getInt("cliente_id"));
+            r.setOrigen(rs.getString("origen"));
+            r.setDestino(rs.getString("destino"));
+            r.setFecha_reserva(rs.getTimestamp("fecha_reserva"));
+            r.setFecha_viaje(rs.getTimestamp("fecha_viaje"));
+            r.setCantidad_pasajeros(rs.getInt("cantidad_pasajeros"));
+            r.setClase(rs.getString("clase"));
+            r.setPrecio_total(rs.getDouble("precio_total"));
+            r.setEstado(rs.getString("estado"));
+            r.setNombres_apellidos(rs.getString("nombres_apellidos"));
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("Error al obtener reserva por ID: " + ex.getMessage());
+    }
+
+    return r;
+}
+
+
     public ArrayList<Reserva> buscarReservas(
             String origen, 
             String destino, 
@@ -259,7 +534,7 @@ public class Controlador {
                 r.setOrigen(rs.getString("origen"));
                 r.setFecha_reserva(rs.getTimestamp("fecha_reserva"));
                 r.setFecha_viaje(rs.getTimestamp("fecha_viaje"));
-                r.setCantidad_pasajeros(rs.getDouble("cantidad_pasajeros"));
+                r.setCantidad_pasajeros(rs.getInt("cantidad_pasajeros"));
                 r.setClase(rs.getString("clase"));
                 r.setPrecio_total(rs.getDouble("precio_total"));
                 r.setEstado(rs.getString("estado"));
@@ -275,11 +550,113 @@ public class Controlador {
 
         return reservas;
     }
+    
+    public List<Reserva> obtenerReservasDisponibles() {
+    List<Reserva> lista = new ArrayList<>();
+    try (Connection cone = getConexion()) {
+        String sql = "SELECT r.*, c.nombres_apellidos FROM reserva r JOIN cliente c ON r.cliente_id = c.id";
+        PreparedStatement pst = cone.prepareStatement(sql);
+        ResultSet rs = pst.executeQuery();
+
+        while (rs.next()) {
+            Reserva r = new Reserva();
+            r.setId(rs.getInt("id"));
+            r.setCliente_id(rs.getInt("cliente_id"));
+            r.setDestino(rs.getString("destino"));
+            r.setOrigen(rs.getString("origen"));
+            r.setClase(rs.getString("clase"));
+            r.setEstado(rs.getString("estado"));
+            r.setNombres_apellidos(rs.getString("nombres_apellidos"));
+            r.setCantidad_pasajeros(rs.getInt("cantidad_pasajeros"));
+            r.setPrecio_total(rs.getDouble("precio_total"));
+            r.setFecha_reserva(rs.getTimestamp("fecha_reserva"));
+            r.setFecha_viaje(rs.getTimestamp("fecha_viaje"));
+            lista.add(r);
+        }
+    } catch (SQLException ex) {
+        System.out.println("Error al cargar reservas: " + ex.getMessage());
+    }
+    return lista;
+}
+    
+    public Factura obtenerFacturaPorId(int id) {
+    Factura factura = null;
+    String sql = "SELECT * FROM factura WHERE id = ?";
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        pst.setInt(1, id);
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            factura = new Factura();
+            factura.setId(rs.getInt("id"));
+            factura.setReserva_id(rs.getInt("reserva_id"));
+            factura.setFecha_emision(rs.getTimestamp("fecha_emision"));
+            factura.setMetodo(rs.getString("metodo_pago"));
+            factura.setSubTotal(rs.getDouble("subtotal"));
+            factura.setIva(rs.getDouble("iva"));
+            factura.setTotal(rs.getDouble("total"));
+            factura.setEstado(rs.getString("estado"));
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al buscar factura: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "Error al buscar factura", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+    return factura;
+}
+public ArrayList<Factura> obtenerFacturasReporte(Date fechaInicio, Date fechaFin, String estado, String metodoPago) {
+    ArrayList<Factura> lista = new ArrayList<>();
+    String sql = "SELECT * FROM factura WHERE fecha_emision BETWEEN ? AND ?";
+
+    if (!estado.equals("Todos")) {
+        sql += " AND estado = ?";
+    }
+    if (!metodoPago.equals("Todos")) {
+        sql += " AND metodo_pago = ?";
+    }
+
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+
+        pst.setTimestamp(1, new Timestamp(fechaInicio.getTime()));
+        pst.setTimestamp(2, new Timestamp(fechaFin.getTime()));
+
+        int paramIndex = 3;
+
+        if (!estado.equals("Todos")) {
+            pst.setString(paramIndex++, estado);
+        }
+
+        if (!metodoPago.equals("Todos")) {
+            pst.setString(paramIndex, metodoPago);
+        }
+
+        ResultSet rs = pst.executeQuery();
+
+        while (rs.next()) {
+            Factura f = new Factura();
+            f.setId(rs.getInt("id"));
+            f.setReserva_id(rs.getInt("reserva_id"));
+            f.setFecha_emision(rs.getTimestamp("fecha_emision"));
+            f.setMetodo(rs.getString("metodo_pago"));
+            f.setSubTotal(rs.getDouble("subtotal"));
+            f.setIva(rs.getDouble("iva"));
+            f.setTotal(rs.getDouble("total"));
+            f.setEstado(rs.getString("estado"));
+            lista.add(f);
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error al obtener reporte de facturas: " + e.getMessage());
+    }
+
+    return lista;
+}
+    
  
     public void EmitirFactura(Factura fa) {
         try {
             Connection cone = getConexion();
-            PreparedStatement pst = cone.prepareStatement("INSERT INTO factura (reserva_id, fecha_emision, metodo_pago, subtotal, iva, total, estado) VALUES(?,?,?,?,?,?,?)");
+            PreparedStatement pst = cone.prepareStatement("INSERT INTO factura () VALUES(?,?,?,?,?,?,?)");
             pst.setInt(1, fa.getReserva_id()); // reserva_id
             pst.setTimestamp(2, fa.getFecha_emision()); // fecha_emision
             pst.setString(3, fa.getMetodo()); // metodo_pago
@@ -423,7 +800,7 @@ public class Controlador {
                 reserva.setOrigen(rs.getString("origen"));
                 reserva.setFecha_reserva(rs.getTimestamp("fecha_reserva"));
                 reserva.setFecha_viaje(rs.getTimestamp("fecha_viaje"));
-                reserva.setCantidad_pasajeros(rs.getDouble("cantidad_pasajeros"));
+                reserva.setCantidad_pasajeros(rs.getInt("cantidad_pasajeros"));
                 reserva.setClase(rs.getString("clase"));
                 reserva.setPrecio_total(rs.getDouble("precio_total"));
                 reserva.setEstado(rs.getString("estado"));
@@ -506,7 +883,7 @@ public class Controlador {
                 c.setOrigen(resul.getString("origen"));
                 c.setFecha_reserva(resul.getTimestamp("fecha_reserva"));
                 c.setFecha_viaje(resul.getTimestamp("fecha_viaje"));
-                c.setCantidad_pasajeros(resul.getDouble("cantidad_pasajeros"));
+                c.setCantidad_pasajeros(resul.getInt("cantidad_pasajeros"));
                 c.setClase(resul.getString("clase"));
                 c.setPrecio_total(resul.getDouble("precio_total"));
                 c.setEstado(resul.getString("estado"));
@@ -609,36 +986,74 @@ public class Controlador {
         }
     }
 
-    public ArrayList<Usuario> listaUsuarios() {
-        ArrayList<Usuario> usuarios = new ArrayList<>();
-        try {
-            Connection cone = getConexion();
-            Statement st = cone.createStatement();
-            ResultSet resul = st.executeQuery(
-                "SELECT * FROM usuario ORDER BY id");
+  public List<Usuario> buscarUsuariosReporte(String cedula, String nombre, String rol, String estado, Timestamp desde, Timestamp hasta) {
+    List<Usuario> lista = new ArrayList<>();
+    StringBuilder sql = new StringBuilder("SELECT * FROM usuario WHERE 1=1");
+    
+    List<Object> parametros = new ArrayList<>();
 
-            while (resul.next()) {
-                Usuario u = new Usuario();
-                u.setId(resul.getInt("id"));
-                u.setCedula(resul.getString("cedula"));
-                u.setNombreCompleto(resul.getString("nombre_completo"));
-                u.setCorreoElectronico(resul.getString("correo_electronico"));
-                u.setTelefono(resul.getString("telefono"));
-                u.setDireccion(resul.getString("direccion"));
-                u.setRol(resul.getString("rol"));
-                u.setNombreUsuario(resul.getString("nombre_usuario"));
-                u.setContrasena(resul.getString("contrasena"));
-                u.setFechaRegistro(resul.getTimestamp("fecha_registro"));
-                u.setEstado(resul.getString("estado"));
-
-                usuarios.add(u);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            JOptionPane.showMessageDialog(null, "Error al cargar lista de usuarios", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
-        return usuarios;
+    if (cedula != null && !cedula.isEmpty()) {
+        sql.append(" AND cedula ILIKE ?");
+        parametros.add("%" + cedula + "%");
     }
+    if (nombre != null && !nombre.isEmpty()) {
+        sql.append(" AND nombre_completo ILIKE ?");
+        parametros.add("%" + nombre + "%");
+    }
+    if (rol != null && !rol.equals("Todos")) {
+        sql.append(" AND rol = ?");
+        parametros.add(rol);
+    }
+    if (estado != null && !estado.equals("Todos")) {
+        sql.append(" AND estado = ?");
+        parametros.add(estado);
+    }
+    if (desde != null) {
+        sql.append(" AND fecha_registro >= ?");
+        parametros.add(desde);
+    }
+    if (hasta != null) {
+        sql.append(" AND fecha_registro <= ?");
+        parametros.add(hasta);
+    }
+
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql.toString())) {
+
+        for (int i = 0; i < parametros.size(); i++) {
+            Object param = parametros.get(i);
+            if (param instanceof Timestamp) {
+                pst.setTimestamp(i + 1, (Timestamp) param);
+            } else {
+                pst.setObject(i + 1, param);
+            }
+        }
+
+        ResultSet rs = pst.executeQuery();
+        while (rs.next()) {
+            Usuario u = new Usuario();
+            u.setId(rs.getInt("id"));
+            u.setCedula(rs.getString("cedula"));
+            u.setNombreCompleto(rs.getString("nombre_completo"));
+            u.setCorreoElectronico(rs.getString("correo_electronico"));
+            u.setTelefono(rs.getString("telefono"));
+            u.setDireccion(rs.getString("direccion"));
+            u.setRol(rs.getString("rol"));
+            u.setNombreUsuario(rs.getString("nombre_usuario"));
+            u.setContrasena(rs.getString("contrasena"));
+            u.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+            u.setEstado(rs.getString("estado"));
+
+            lista.add(u);
+        }
+
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al consultar usuarios", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+
+    return lista;
+}  
     
     public void eliminarUsuario(int id) {
         try {
@@ -699,7 +1114,7 @@ public class Controlador {
             Connection cone = getConexion();
             PreparedStatement pst = cone.prepareStatement(
                 "INSERT INTO transporte (placa, modelo_vehiculo, tipo_vehiculo, kilometraje, anio_fabricacion, consumo_combustible_por_km, estado) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)"
+                "VALUES (?, ?, ?, ?, ?, ?, true)"
             );
 
             pst.setString(1, transporte.getPlaca());
@@ -708,7 +1123,7 @@ public class Controlador {
             pst.setInt(4, transporte.getKilometraje());
             pst.setInt(5, transporte.getAnioFabricacion());
             pst.setString(6, transporte.getConsumoCombustiblePorKm());
-            pst.setBoolean(7, transporte.getEstado());
+            
 
             pst.executeUpdate();
             JOptionPane.showMessageDialog(null, "Transporte registrado correctamente", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
@@ -767,32 +1182,30 @@ public class Controlador {
         }
     }
     
-    // Este metodo servira para traer de la tabla de Transporte las placas
-    // y ubicarlas en el combobox de paquete turistico
-    public ArrayList<String> obtenerPlacasDisponibles() {
-        ArrayList<String> placas = new ArrayList<>();
-        try {
-            Connection cone = getConexion();
-            PreparedStatement pst = cone.prepareStatement("SELECT placa FROM transporte WHERE estado = true");
-            ResultSet rs = pst.executeQuery();
-
-            while (rs.next()) {
-                placas.add(rs.getString("placa"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, "Error al cargar placas", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
-        return placas;
-    }
-    
-    public ArrayList<Transporte> listarTransporte() {
+    public static ArrayList<Transporte> buscarTransporte(String placa, String tipo, int anio, Boolean estado) {
         ArrayList<Transporte> lista = new ArrayList<>();
-        try {
-            Connection cone = getConexion();
-            Statement st = cone.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM transporte ORDER BY placa");
+        StringBuilder sql = new StringBuilder("SELECT * FROM transporte WHERE 1=1");
 
+        if (!placa.isEmpty()) sql.append(" AND LOWER(placa) LIKE ?");
+        if (!tipo.isEmpty()) sql.append(" AND tipo_vehiculo = ?");
+        if (anio > 0) sql.append(" AND anio_fabricacion = ?");
+        if (estado != null) sql.append(" AND estado = ?");
+
+        try (Connection con = getConexion();
+             PreparedStatement pst = con.prepareStatement(sql.toString())) {
+
+            int idx = 1;
+
+            if (!placa.isEmpty()) pst.setString(idx++, "%" + placa.toLowerCase() + "%");
+            if (!tipo.isEmpty()) pst.setString(idx++, tipo);
+            if (anio > 0) {
+            sql.append(" AND anio_fabricacion = ?");
+    pst.setInt(idx++, anio);
+            }
+            
+            if (estado != null) pst.setBoolean(idx++, estado);
+
+            ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Transporte t = new Transporte();
                 t.setPlaca(rs.getString("placa"));
@@ -802,15 +1215,33 @@ public class Controlador {
                 t.setAnioFabricacion(rs.getInt("anio_fabricacion"));
                 t.setConsumoCombustiblePorKm(rs.getString("consumo_combustible_por_km"));
                 t.setEstado(rs.getBoolean("estado"));
-
                 lista.add(t);
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            JOptionPane.showMessageDialog(null, "Error al cargar lista de transporte", "ERROR", JOptionPane.ERROR_MESSAGE);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         return lista;
     }
+    public List<String> obtenerTransportesDisponibles() {
+    List<String> lista = new ArrayList<>();
+    String sql = "SELECT tipo_vehiculo, placa FROM transporte WHERE estado = true";
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql);
+         ResultSet rs = pst.executeQuery()) {
+
+        while (rs.next()) {
+            String tipo = rs.getString("tipo_vehiculo");
+            String placa = rs.getString("placa");
+            lista.add(tipo + " - " + placa);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return lista;
+}
+    
     
     public Transporte obtenerTransportePorPlaca(String placa) {
         Transporte transporte = null;
@@ -837,32 +1268,7 @@ public class Controlador {
         return transporte;
     }
     
-    public ArrayList<Transporte> obtenerTransportePorEstado(boolean estado) {
-        ArrayList<Transporte> lista = new ArrayList<>();
-        try {
-            Connection cone = getConexion();
-            PreparedStatement pst = cone.prepareStatement("SELECT * FROM transporte WHERE estado = ?");
-            pst.setBoolean(1, estado);
-
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-                Transporte t = new Transporte();
-                t.setPlaca(rs.getString("placa"));
-                t.setModeloVehiculo(rs.getString("modelo_vehiculo"));
-                t.setTipoVehiculo(rs.getString("tipo_vehiculo"));
-                t.setKilometraje(rs.getInt("kilometraje"));
-                t.setAnioFabricacion(rs.getInt("anio_fabricacion"));
-                t.setConsumoCombustiblePorKm(rs.getString("consumo_combustible_por_km"));
-                t.setEstado(rs.getBoolean("estado"));
-
-                lista.add(t);
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, "Error al buscar transporte por estado", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
-        return lista;
-    }
+    
     
     // Este metodo es una combinacion, como no veo logico que la consulta sea por estado
     // se unio en una sola linea SQL para que haga la consulta y por ende para la parte
@@ -895,31 +1301,111 @@ public class Controlador {
     
     // Modulo de Paquete turistico
     
-    public void insertarPaqueteTuristico(PaqueteTuristico paquete) {
-        try {
-            Connection cone = getConexion();
-            PreparedStatement pst = cone.prepareStatement(
-                "INSERT INTO paquete_turistico (nombre_paquete, destino, precio_destino, hospedaje, transporte_placa, actividades, duracion_dias, fecha_inicio, fecha_fin, precio_total) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    public ArrayList<PaqueteTuristico> obtenerPaquetesFiltrados(String destino, String hospedaje, String transporte, String fechaIni, String fechaFin, int duracionMin) {
+    ArrayList<PaqueteTuristico> lista = new ArrayList<>();
 
-            pst.setString(1, paquete.getNombrePaquete());
-            pst.setString(2, paquete.getDestino());
-            pst.setDouble(3, paquete.getPrecioDestino());
-            pst.setString(4, paquete.getHospedaje());
-            pst.setString(5, paquete.getTransportePlaca());
-            pst.setString(6, paquete.getActividades());
-            pst.setInt(7, paquete.getDuracionDias());
-            pst.setString(8, paquete.getFechaInicio());
-            pst.setString(9, paquete.getFechaFin());
-            pst.setDouble(10, paquete.getPrecioTotal());
+    StringBuilder sql = new StringBuilder("SELECT * FROM paquete_turistico WHERE 1=1");
 
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Paquete turístico registrado correctamente", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, "Error al registrar paquete turístico", "ERROR", JOptionPane.ERROR_MESSAGE);
+    if (destino != null) sql.append(" AND destino = '").append(destino).append("'");
+    if (hospedaje != null) sql.append(" AND hospedaje = '").append(hospedaje).append("'");
+    if (transporte != null) sql.append(" AND transporte_placa = '").append(transporte).append("'");
+    if (fechaIni != null && fechaFin != null)
+        sql.append(" AND fecha_inicio >= '").append(fechaIni).append("' AND fecha_fin <= '").append(fechaFin).append("'");
+    sql.append(" AND duracion_dias >= ").append(duracionMin);
+
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql.toString());
+         ResultSet rs = pst.executeQuery()) {
+
+        while (rs.next()) {
+            PaqueteTuristico p = new PaqueteTuristico();
+            p.setNombrePaquete(rs.getString("nombre_paquete"));
+            p.setDestino(rs.getString("destino"));
+            p.setPrecioDestino(rs.getDouble("precio_destino"));
+            p.setHospedaje(rs.getString("hospedaje"));
+            p.setTransportePlaca(rs.getString("transporte_placa"));
+            p.setActividades(rs.getString("actividades"));
+            p.setDuracionDias(rs.getInt("duracion_dias"));
+            p.setFechaInicio(rs.getString("fecha_inicio"));
+            p.setFechaFin(rs.getString("fecha_fin"));
+            p.setPrecioTotal(rs.getDouble("precio_total"));
+            lista.add(p);
         }
+
+    } catch (SQLException e) {
+        System.out.println("Error al obtener paquetes: " + e.getMessage());
     }
+
+    return lista;
+}
+    
+    
+    public PaqueteTuristico buscarPaquetePorNombre(String nombrePaquete) {
+    PaqueteTuristico paquete = null;
+    String sql = "SELECT * FROM paquete_turistico WHERE nombre_paquete = ?";
+
+    try (Connection con = getConexion();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+
+        pst.setString(1, nombrePaquete);
+        ResultSet rs = pst.executeQuery();
+
+        if (rs.next()) {
+            paquete = new PaqueteTuristico();
+            paquete.setNombrePaquete(rs.getString("nombre_paquete"));
+            paquete.setDestino(rs.getString("destino"));
+            paquete.setPrecioDestino(rs.getDouble("precio_destino"));
+            paquete.setHospedaje(rs.getString("hospedaje"));
+            paquete.setTransportePlaca(rs.getString("transporte_placa"));
+            paquete.setActividades(rs.getString("actividades"));
+            paquete.setDuracionDias(rs.getInt("duracion_dias"));
+            paquete.setFechaInicio(rs.getString("fecha_inicio"));
+            paquete.setFechaFin(rs.getString("fecha_fin"));
+            paquete.setPrecioTotal(rs.getDouble("precio_total"));
+        }
+
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al buscar el paquete", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+
+    return paquete;
+}
+    
+    public void insertarPaqueteTuristico(PaqueteTuristico paquete, JComboBox<String> cmbTransporte) {
+    try {
+        Connection cone = getConexion();
+        PreparedStatement pst = cone.prepareStatement(
+            "INSERT INTO paquete_turistico (nombre_paquete, destino, precio_destino, hospedaje, transporte_placa, actividades, duracion_dias, fecha_inicio, fecha_fin, precio_total) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        pst.setString(1, paquete.getNombrePaquete());
+        pst.setString(2, paquete.getDestino());
+        pst.setDouble(3, paquete.getPrecioDestino());
+        pst.setString(4, paquete.getHospedaje());
+
+        // Extraer solo la placa del transporte
+        String transporteSeleccionado = (String) cmbTransporte.getSelectedItem();
+        String placaTransporte = null;
+        if (transporteSeleccionado != null && transporteSeleccionado.contains(" - ")) {
+            placaTransporte = transporteSeleccionado.split(" - ")[1];
+        }
+        pst.setString(5, placaTransporte);
+
+        pst.setString(6, paquete.getActividades());
+        pst.setInt(7, paquete.getDuracionDias());
+        pst.setString(8, paquete.getFechaInicio());
+        pst.setString(9, paquete.getFechaFin());
+        pst.setDouble(10, paquete.getPrecioTotal());
+
+        pst.executeUpdate();
+        JOptionPane.showMessageDialog(null, "Paquete turístico registrado correctamente", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
+    } catch (SQLException ex) {
+        System.out.println(ex.getMessage());
+        JOptionPane.showMessageDialog(null, "Error al registrar paquete turístico", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+}
+    
     
     public void modificarPaqueteTuristico(PaqueteTuristico paquete) {
         try {
@@ -968,60 +1454,7 @@ public class Controlador {
         }
     }
     
-    public ArrayList<PaqueteTuristico> listarPaqueteTuristico() {
-        ArrayList<PaqueteTuristico> lista = new ArrayList<>();
-        try {
-            Connection cone = getConexion();
-            Statement st = cone.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM paquete_turistico");
-
-            while (rs.next()) {
-                PaqueteTuristico p = new PaqueteTuristico();
-                p.setNombrePaquete(rs.getString("nombre_paquete"));
-                p.setDestino(rs.getString("destino"));
-                p.setPrecioDestino(rs.getDouble("precio_destino"));
-                p.setHospedaje(rs.getString("hospedaje"));
-                p.setTransportePlaca(rs.getString("transporte_placa"));
-                p.setActividades(rs.getString("actividades"));
-                p.setDuracionDias(rs.getInt("duracion_dias"));
-                p.setFechaInicio(rs.getString("fecha_inicio"));
-                p.setFechaFin(rs.getString("fecha_fin"));
-                p.setPrecioTotal(rs.getDouble("precio_total"));
-
-                lista.add(p);
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, "Error al listar paquetes turísticos", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
-        return lista;
-    }
     
-    public PaqueteTuristico obtenerPaquetePorNombre(String nombrePaquete) {
-        PaqueteTuristico paquete = null;
-        try {
-            Connection cone = getConexion();
-            PreparedStatement pst = cone.prepareStatement("SELECT * FROM paquete_turistico WHERE nombre_paquete = ?");
-            pst.setString(1, nombrePaquete);
-
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                paquete = new PaqueteTuristico();
-                paquete.setNombrePaquete(rs.getString("nombre_paquete"));
-                paquete.setDestino(rs.getString("destino"));
-                paquete.setPrecioDestino(rs.getDouble("precio_destino"));
-                paquete.setHospedaje(rs.getString("hospedaje"));
-                paquete.setTransportePlaca(rs.getString("transporte_placa"));
-                paquete.setActividades(rs.getString("actividades"));
-                paquete.setDuracionDias(rs.getInt("duracion_dias"));
-                paquete.setFechaInicio(rs.getString("fecha_inicio"));
-                paquete.setFechaFin(rs.getString("fecha_fin"));
-                paquete.setPrecioTotal(rs.getDouble("precio_total"));
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, "Error al buscar paquete turístico por nombre", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
-        return paquete;
-    }
+    
+   
 }

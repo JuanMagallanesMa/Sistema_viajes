@@ -4,14 +4,18 @@
  */
 package capaPresentacion.Transporte;
 
+import capaNegocio.Controlador;
 import capaPresentacion.Usuario.*;
+import entidades.Transporte;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Juan magallanes
  */
 public class JPDeleteTransporte extends javax.swing.JPanel {
-
+Transporte transporte = new Transporte();
+    Controlador controlador = new Controlador();
     /**
      * Creates new form JPCreate
      */
@@ -38,7 +42,6 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
         txtConsumoCombustible = new javax.swing.JTextField();
         btnEliminar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        cmbEstado = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         txtPlaca = new javax.swing.JTextField();
         txtAnioFabricacion = new javax.swing.JTextField();
@@ -50,6 +53,12 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(503, 404));
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         txtBusqueda2.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
         txtBusqueda2.setMinimumSize(new java.awt.Dimension(200, 50));
@@ -84,11 +93,6 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
 
         jLabel1.setText("km");
 
-        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Activo", "Mantenimiento", "Inactivo" }));
-        cmbEstado.setBorder(javax.swing.BorderFactory.createTitledBorder("Estado"));
-        cmbEstado.setMinimumSize(new java.awt.Dimension(64, 39));
-        cmbEstado.setPreferredSize(new java.awt.Dimension(200, 50));
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -102,12 +106,9 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1))
-                            .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -122,9 +123,7 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(62, 62, 62)
                 .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -139,6 +138,7 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
         txtAnioFabricacion.setMinimumSize(new java.awt.Dimension(200, 50));
         txtAnioFabricacion.setPreferredSize(new java.awt.Dimension(200, 50));
 
+        cmbTipoVehiculo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Bus", "Auto" }));
         cmbTipoVehiculo.setBorder(javax.swing.BorderFactory.createTitledBorder("Tipo de vehiculo"));
         cmbTipoVehiculo.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbTipoVehiculo.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -147,6 +147,11 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setBorder(null);
         btnLimpiar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -244,13 +249,63 @@ public class JPDeleteTransporte extends javax.swing.JPanel {
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
+        String placa = txtPlaca.getText().trim();
+
+        if (!placa.isEmpty()) {
+            int confirm = JOptionPane.showConfirmDialog(null, 
+                "¿Estás seguro de que deseas inhabilitar este transporte?", 
+                "Confirmar eliminación", 
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                
+                controlador.eliminarTransporte(placa);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "No hay placa seleccionada", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+         String placaBuscada = txtBusqueda2.getText().trim();
+        if (!placaBuscada.isEmpty()) {
+            transporte = controlador.obtenerTransportePorPlaca(placaBuscada);
+
+            if (transporte != null) {
+                txtPlaca.setText(transporte.getPlaca());
+                txtPlaca.setEditable(false); // Evita que se cambie
+                txtModelo.setText(transporte.getModeloVehiculo());
+                cmbTipoVehiculo.setSelectedItem(transporte.getTipoVehiculo());
+                txtKilometraje.setText(String.valueOf(transporte.getKilometraje()));
+                txtAnioFabricacion.setText(String.valueOf(transporte.getAnioFabricacion()));
+                txtConsumoCombustible.setText(transporte.getConsumoCombustiblePorKm());
+            } else {
+                JOptionPane.showMessageDialog(null, "No se encontró transporte con esa placa", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                limpiarCampos(); // Opcional: limpiar si no se encuentra
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Ingrese una placa para buscar", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // TODO add your handling code here:
+        limpiarCampos();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+     private void limpiarCampos() {
+        txtPlaca.setText("");
+        txtModelo.setText("");
+        cmbTipoVehiculo.setSelectedIndex(0);
+        txtKilometraje.setText("");
+        txtAnioFabricacion.setText("");
+        txtConsumoCombustible.setText("");
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnLimpiar;
-    private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JComboBox<String> cmbTipoVehiculo;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;

@@ -5,21 +5,31 @@
  */
 package capaPresentacion.Factura;
 
+import capaNegocio.Controlador;
 import capaPresentacion.Reserva.*;
 import capaPresentacion.PaquetesTuristicos.*;
 import capaPresentacion.Usuario.*;
-
+import entidades.Factura;
+import entidades.Reserva;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.sql.Timestamp;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Juan magallanes
  */
 public class JPCreateFactura extends javax.swing.JPanel {
-
+    Controlador controlador = new Controlador();
+    
     /**
      * Creates new form JPCreate
      */
     public JPCreateFactura() {
         initComponents();
+        agregarMetodo();
+        cargarReservas();
     }
 
     /**
@@ -50,7 +60,7 @@ public class JPCreateFactura extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         lblRecargo = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        cmbReserva = new javax.swing.JComboBox<>();
+        cmbReserva = new javax.swing.JComboBox<Reserva>();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -74,6 +84,11 @@ public class JPCreateFactura extends javax.swing.JPanel {
         cmbMetodoPago.setBorder(javax.swing.BorderFactory.createTitledBorder("Metodo de pago"));
         cmbMetodoPago.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbMetodoPago.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbMetodoPago.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbMetodoPagoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -194,6 +209,11 @@ public class JPCreateFactura extends javax.swing.JPanel {
         cmbReserva.setBorder(javax.swing.BorderFactory.createTitledBorder("Reserva"));
         cmbReserva.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbReserva.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbReserva.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbReservaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -262,14 +282,119 @@ public class JPCreateFactura extends javax.swing.JPanel {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
+        try {
+        // Validar que haya una reserva seleccionada
+        Reserva reservaSeleccionada = (Reserva) cmbReserva.getSelectedItem();
+        if (reservaSeleccionada == null) {
+            JOptionPane.showMessageDialog(null, "Seleccione una reserva válida", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Obtener datos para factura
+        int reservaId = reservaSeleccionada.getId();
+        Timestamp fechaEmision = new Timestamp(System.currentTimeMillis()); // fecha actual
+        String metodoPago = (String) cmbMetodoPago.getSelectedItem();
+        double subtotal = Double.parseDouble(lblSubtotal.getText().replace(",", "."));
+        double iva = Double.parseDouble(lblIVA.getText().replace(",", "."));
+        double total = Double.parseDouble(lblTotal.getText().replace(",", "."));
+        String estado = "Pendiente";
+
+        // Crear objeto factura
+        Factura factura = new Factura();
+        factura.setReserva_id(reservaId);
+        factura.setFecha_emision(fechaEmision);
+        factura.setMetodo(metodoPago);
+        factura.setSubTotal(subtotal);
+        factura.setIva(iva);
+        factura.setTotal(total);
+        factura.setEstado(estado);
+
+        // Llamar al método para insertar factura en BD
+        controlador.EmitirFactura(factura);
+
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(null, "Error al leer valores numéricos", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+        
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    private void cmbMetodoPagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMetodoPagoActionPerformed
+        // TODO add your handling code here:
+        calcularTotales();
+        
+    }//GEN-LAST:event_cmbMetodoPagoActionPerformed
+
+    void agregarMetodo(){
+        cmbMetodoPago.addItem("Efectivo");
+        cmbMetodoPago.addItem("Transferencia");
+        cmbMetodoPago.addItem("Tarjeta de Crédito");
+    }
+    
+    private void cmbReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbReservaActionPerformed
+            calcularTotales();
+    }//GEN-LAST:event_cmbReservaActionPerformed
+
+    private final double IVA = 0.15;       // 12% IVA
+private final double RECARGO = 0.05;   // 5% recargo tarjeta crédito
+
+private void calcularTotales() {
+    Reserva reservaSeleccionada = (Reserva) cmbReserva.getSelectedItem();
+    if (reservaSeleccionada == null) {
+        lblSubtotal.setText("0.00");
+        lblIVA.setText("0.00");
+        lblRecargo.setText("0.00");
+        lblTotal.setText("0.00");
+        return;
+    }
+
+    double subtotal = reservaSeleccionada.getPrecio_total() != null ? reservaSeleccionada.getPrecio_total() : 0.0;
+    lblSubtotal.setText(String.format("%.2f", subtotal));
+
+    // Calcular IVA
+    double ivaMonto = subtotal * IVA;
+    lblIVA.setText(String.format("%.2f", ivaMonto));
+
+    // Calcular recargo según método pago
+    double recargoMonto = 0.0;
+    String metodoPago = (String) cmbMetodoPago.getSelectedItem();
+    if ("Tarjeta de Crédito".equalsIgnoreCase(metodoPago)) {
+        recargoMonto = subtotal * RECARGO;
+    }
+    lblRecargo.setText(String.format("%.2f", recargoMonto));
+
+    // Total final
+    double total = subtotal + ivaMonto + recargoMonto;
+    lblTotal.setText(String.format("%.2f", total));
+}
+    
+    
+    
+    
+    ArrayList<Reserva> reservas = controlador.obtenerReservasCmb();
+    private void cargarReservas() {
+        
+        cmbReserva.removeAllItems();
+        for (Reserva r : reservas) {
+            cmbReserva.addItem(r);
+        }
+        if (!reservas.isEmpty()) {
+        cmbReserva.setSelectedIndex(0);
+        actualizarSubtotal();
+    }
+        
+    }
+    private void actualizarSubtotal() {
+    Reserva reservaSeleccionada = (Reserva) cmbReserva.getSelectedItem();
+    if (reservaSeleccionada != null) {
+        lblSubtotal.setText(String.format("%.2f", reservaSeleccionada.precio_total));
+    }
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JComboBox<String> cmbMetodoPago;
-    private javax.swing.JComboBox<String> cmbReserva;
+    private javax.swing.JComboBox<Reserva> cmbReserva;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

@@ -4,7 +4,14 @@
  */
 package capaPresentacion.Cliente;
 
-import capaPresentacion.Usuario.*;
+import capaNegocio.Controlador;
+
+import entidades.Cliente;
+import java.time.LocalDateTime;
+import javax.swing.JOptionPane;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -34,6 +41,7 @@ public class JPCreateCliente extends javax.swing.JPanel {
         txtNombresCompletos = new javax.swing.JTextField();
         txtDireccion = new javax.swing.JTextField();
         txtTelefono = new javax.swing.JTextField();
+        txtCorreoElectronico = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         btnGuardar = new javax.swing.JButton();
         btnLimpiar = new javax.swing.JButton();
@@ -62,6 +70,10 @@ public class JPCreateCliente extends javax.swing.JPanel {
         txtTelefono.setMinimumSize(new java.awt.Dimension(200, 50));
         txtTelefono.setPreferredSize(new java.awt.Dimension(200, 50));
 
+        txtCorreoElectronico.setBorder(javax.swing.BorderFactory.createTitledBorder("Correo Electronico"));
+        txtCorreoElectronico.setMinimumSize(new java.awt.Dimension(200, 50));
+        txtCorreoElectronico.setPreferredSize(new java.awt.Dimension(200, 50));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -72,20 +84,23 @@ public class JPCreateCliente extends javax.swing.JPanel {
                     .addComponent(txtNombresCompletos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                     .addComponent(txtCedula, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtTelefono, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txtDireccion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtCorreoElectronico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(txtNombresCompletos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(txtCedula, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(txtCorreoElectronico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         btnGuardar.setBackground(new java.awt.Color(102, 102, 102));
@@ -156,15 +171,36 @@ public class JPCreateCliente extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(40, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+        guardarCliente();
+// TODO add your handling code here:
+
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void guardarCliente() {
+        try {
+            Cliente cli = new Cliente();
+            cli.setNombres_apellidos(txtNombresCompletos.getText());
+            cli.setDireccion(txtDireccion.getText());
+            cli.setTelefono(txtTelefono.getText());
+            cli.setCedula(txtCedula.getText());
+            cli.setCorreoelectronico(txtCorreoElectronico.getText()); // Si tienes un campo de correo, reemplaza esto
+            cli.setFecha_registro(Timestamp.valueOf(LocalDateTime.now())); // Fecha actual
+
+            Controlador controlador = new Controlador(); // o el nombre de tu clase real
+            controlador.InsertarCliente(cli);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar: " + e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -174,6 +210,7 @@ public class JPCreateCliente extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JTextField txtCedula;
+    private javax.swing.JTextField txtCorreoElectronico;
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtNombresCompletos;
     private javax.swing.JTextField txtTelefono;

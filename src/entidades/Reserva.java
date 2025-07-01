@@ -8,15 +8,15 @@ import java.sql.Timestamp;
  * @author MICHELLE
  */
 public class Reserva {
-public int cliente_id,  id;
+public int cliente_id, cantidad_pasajeros, id;
  public String  destino, origen, clase, estado, nombres_apellidos;
- public Double cantidad_pasajeros, precio_total;
+ public Double  precio_total;
  public java.sql.Timestamp fecha_reserva, fecha_viaje;
 
     public Reserva() {
     }
 
-    public Reserva(int id, int cliente_id, String destino, String origen, String clase, String estado, Double cantidad_pasajeros, Double precio_total, Timestamp fecha_reserva, Timestamp fecha_viaje, String nombres_apellidos) {
+    public Reserva(int id, int cliente_id, String destino, String origen, String clase, String estado, int cantidad_pasajeros, Double precio_total, Timestamp fecha_reserva, Timestamp fecha_viaje, String nombres_apellidos) {
        this.id = id;
         this.cliente_id = cliente_id;
         this.destino = destino;
@@ -83,11 +83,11 @@ public int cliente_id,  id;
         this.estado = estado;
     }
 
-    public Double getCantidad_pasajeros() {
+    public int getCantidad_pasajeros() {
         return cantidad_pasajeros;
     }
 
-    public void setCantidad_pasajeros(Double cantidad_pasajeros) {
+    public void setCantidad_pasajeros(int cantidad_pasajeros) {
         this.cantidad_pasajeros = cantidad_pasajeros;
     }
 
@@ -114,4 +114,10 @@ public int cliente_id,  id;
     public void setFecha_viaje(Timestamp fecha_viaje) {
         this.fecha_viaje = fecha_viaje;
     }
+    
+    @Override
+    public String toString() {
+        return id + " - " + nombres_apellidos;
+    }
+
 }

@@ -18,6 +18,7 @@ public class JPReserva extends javax.swing.JPanel {
     JPCreateReserva crear = new JPCreateReserva();
     JPDeleteReserva eliminar = new JPDeleteReserva();
     JPEditReserva editar = new JPEditReserva();
+    JPReporteReserva reporte = new JPReporteReserva();
     /**
      * Creates new form JPUsuario
      */
@@ -158,6 +159,13 @@ public class JPReserva extends javax.swing.JPanel {
 
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
         // TODO add your handling code here:
+        panelContenedor.removeAll();
+        
+        panelContenedor.setLayout(new BorderLayout());
+        panelContenedor.add(reporte, BorderLayout.CENTER);
+        
+        panelContenedor.revalidate();
+        panelContenedor.repaint();
     }//GEN-LAST:event_btnReporteActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed

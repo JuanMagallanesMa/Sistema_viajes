@@ -85,4 +85,7 @@ public class Transporte {
     public void setEstado(boolean estado){
         this.estado = estado;
     }
+    
+    public boolean isEstado() { return estado; }
+    
 }

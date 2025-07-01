@@ -4,14 +4,18 @@
  */
 package capaPresentacion.Transporte;
 
+import capaNegocio.Controlador;
 import capaPresentacion.Usuario.*;
+import entidades.Transporte;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Juan magallanes
  */
 public class JPEditTransporte extends javax.swing.JPanel {
-
+    Transporte transporte = new Transporte();
+    Controlador controlador = new Controlador();
     /**
      * Creates new form JPCreate
      */
@@ -30,7 +34,7 @@ public class JPEditTransporte extends javax.swing.JPanel {
 
         jPanel6 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
-        txtBusqueda2 = new javax.swing.JTextField();
+        txtBusqueda = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         txtKilometraje = new javax.swing.JTextField();
@@ -38,7 +42,6 @@ public class JPEditTransporte extends javax.swing.JPanel {
         txtConsumoCombustible = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        cmbEstado = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         txtPlaca = new javax.swing.JTextField();
         txtAnioFabricacion = new javax.swing.JTextField();
@@ -51,9 +54,15 @@ public class JPEditTransporte extends javax.swing.JPanel {
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
 
-        txtBusqueda2.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
-        txtBusqueda2.setMinimumSize(new java.awt.Dimension(200, 50));
-        txtBusqueda2.setPreferredSize(new java.awt.Dimension(200, 50));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        txtBusqueda.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
+        txtBusqueda.setMinimumSize(new java.awt.Dimension(200, 50));
+        txtBusqueda.setPreferredSize(new java.awt.Dimension(200, 50));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -84,11 +93,6 @@ public class JPEditTransporte extends javax.swing.JPanel {
 
         jLabel1.setText("km");
 
-        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Activo", "Mantenimiento", "Inactivo" }));
-        cmbEstado.setBorder(javax.swing.BorderFactory.createTitledBorder("Estado"));
-        cmbEstado.setMinimumSize(new java.awt.Dimension(64, 39));
-        cmbEstado.setPreferredSize(new java.awt.Dimension(200, 50));
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -102,12 +106,9 @@ public class JPEditTransporte extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1))
-                            .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -122,9 +123,7 @@ public class JPEditTransporte extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtConsumoCombustible, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(62, 62, 62)
                 .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -139,6 +138,7 @@ public class JPEditTransporte extends javax.swing.JPanel {
         txtAnioFabricacion.setMinimumSize(new java.awt.Dimension(200, 50));
         txtAnioFabricacion.setPreferredSize(new java.awt.Dimension(200, 50));
 
+        cmbTipoVehiculo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Bus", "Auto" }));
         cmbTipoVehiculo.setBorder(javax.swing.BorderFactory.createTitledBorder("Tipo de vehiculo"));
         cmbTipoVehiculo.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbTipoVehiculo.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -147,6 +147,11 @@ public class JPEditTransporte extends javax.swing.JPanel {
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setBorder(null);
         btnLimpiar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -207,7 +212,7 @@ public class JPEditTransporte extends javax.swing.JPanel {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(txtBusqueda2, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -218,7 +223,7 @@ public class JPEditTransporte extends javax.swing.JPanel {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtBusqueda2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -244,28 +249,80 @@ public class JPEditTransporte extends javax.swing.JPanel {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
+         try {
+            
+
+            transporte.setPlaca(txtPlaca.getText()); // No editable
+            transporte.setModeloVehiculo(txtModelo.getText());
+            transporte.setTipoVehiculo(cmbTipoVehiculo.getSelectedItem().toString());
+            transporte.setKilometraje(Integer.parseInt(txtKilometraje.getText()));
+            transporte.setAnioFabricacion(Integer.parseInt(txtAnioFabricacion.getText()));
+            transporte.setConsumoCombustiblePorKm(txtConsumoCombustible.getText());
+
+            // Siempre true ya que no hay cmbEstado
+            transporte.setEstado(true);
+
+            
+            controlador.modificarTransporte(transporte);
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Kilometraje o año inválido", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error al modificar el transporte: " + ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        String placaBuscada = txtBusqueda.getText().trim();
+        if (!placaBuscada.isEmpty()) {
+            transporte = controlador.obtenerTransportePorPlaca(placaBuscada);
+
+            if (transporte != null) {
+                txtPlaca.setText(transporte.getPlaca());
+                txtPlaca.setEditable(false); // Evita que se cambie
+                txtModelo.setText(transporte.getModeloVehiculo());
+                cmbTipoVehiculo.setSelectedItem(transporte.getTipoVehiculo());
+                txtKilometraje.setText(String.valueOf(transporte.getKilometraje()));
+                txtAnioFabricacion.setText(String.valueOf(transporte.getAnioFabricacion()));
+                txtConsumoCombustible.setText(transporte.getConsumoCombustiblePorKm());
+            } else {
+                JOptionPane.showMessageDialog(null, "No se encontró transporte con esa placa", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                limpiarCampos(); // Opcional: limpiar si no se encuentra
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Ingrese una placa para buscar", "INFORMACIÓN", JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // TODO add your handling code here:
+        limpiarCampos();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+    private void limpiarCampos() {
+        txtPlaca.setText("");
+        txtModelo.setText("");
+        cmbTipoVehiculo.setSelectedIndex(0);
+        txtKilometraje.setText("");
+        txtAnioFabricacion.setText("");
+        txtConsumoCombustible.setText("");
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
-    private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JComboBox<String> cmbTipoVehiculo;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JTextField txtAnioFabricacion;
     private javax.swing.JTextField txtBusqueda;
-    private javax.swing.JTextField txtBusqueda1;
-    private javax.swing.JTextField txtBusqueda2;
     private javax.swing.JTextField txtConsumoCombustible;
     private javax.swing.JTextField txtKilometraje;
     private javax.swing.JTextField txtModelo;

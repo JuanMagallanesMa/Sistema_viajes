@@ -5,20 +5,40 @@
  */
 package capaPresentacion.Reserva;
 
+import capaNegocio.Controlador;
 import capaPresentacion.PaquetesTuristicos.*;
 import capaPresentacion.Usuario.*;
+import entidades.Cliente;
+import entidades.Reserva;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import java.sql.Timestamp;
+import java.util.Date;
+import javax.swing.event.ChangeListener;
+
+
 
 /**
  *
  * @author Juan magallanes
  */
 public class JPDeleteReserva extends javax.swing.JPanel {
-
+        Controlador controlador = new Controlador();
+        ArrayList<Reserva> reservas = controlador.obtenerReservasCmb();
     /**
      * Creates new form JPCreate
      */
     public JPDeleteReserva() {
         initComponents();
+        cargarCmbBusqueda();
+        cargarPaises();
+        cargarClientes();
+        cargarClases();
+        configurarEventos();
     }
 
     /**
@@ -32,10 +52,10 @@ public class JPDeleteReserva extends javax.swing.JPanel {
 
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        btnEliminar = new javax.swing.JButton();
         cmbOrigen = new javax.swing.JComboBox<>();
         cmbDestino = new javax.swing.JComboBox<>();
         cmbCliente = new javax.swing.JComboBox<>();
+        btnEliminar = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         txtPrecioTotal = new javax.swing.JTextField();
         cmbClase = new javax.swing.JComboBox<>();
@@ -48,7 +68,7 @@ public class JPDeleteReserva extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
-        txtBusqueda4 = new javax.swing.JTextField();
+        cmbBusqueda = new javax.swing.JComboBox<Reserva>();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -57,6 +77,28 @@ public class JPDeleteReserva extends javax.swing.JPanel {
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
+        cmbOrigen.setBorder(javax.swing.BorderFactory.createTitledBorder("Origen"));
+        cmbOrigen.setMinimumSize(new java.awt.Dimension(64, 39));
+        cmbOrigen.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbOrigen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbOrigenActionPerformed(evt);
+            }
+        });
+
+        cmbDestino.setBorder(javax.swing.BorderFactory.createTitledBorder("Destino"));
+        cmbDestino.setMinimumSize(new java.awt.Dimension(64, 39));
+        cmbDestino.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbDestino.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbDestinoActionPerformed(evt);
+            }
+        });
+
+        cmbCliente.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente"));
+        cmbCliente.setMinimumSize(new java.awt.Dimension(64, 39));
+        cmbCliente.setPreferredSize(new java.awt.Dimension(200, 50));
 
         btnEliminar.setBackground(new java.awt.Color(102, 102, 102));
         btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
@@ -69,18 +111,6 @@ public class JPDeleteReserva extends javax.swing.JPanel {
             }
         });
 
-        cmbOrigen.setBorder(javax.swing.BorderFactory.createTitledBorder("Origen"));
-        cmbOrigen.setMinimumSize(new java.awt.Dimension(64, 39));
-        cmbOrigen.setPreferredSize(new java.awt.Dimension(200, 50));
-
-        cmbDestino.setBorder(javax.swing.BorderFactory.createTitledBorder("Destino"));
-        cmbDestino.setMinimumSize(new java.awt.Dimension(64, 39));
-        cmbDestino.setPreferredSize(new java.awt.Dimension(200, 50));
-
-        cmbCliente.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente"));
-        cmbCliente.setMinimumSize(new java.awt.Dimension(64, 39));
-        cmbCliente.setPreferredSize(new java.awt.Dimension(200, 50));
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -88,18 +118,18 @@ public class JPDeleteReserva extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(cmbOrigen, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cmbDestino, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(cmbCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -111,7 +141,7 @@ public class JPDeleteReserva extends javax.swing.JPanel {
                 .addComponent(cmbOrigen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(cmbDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(85, 85, 85)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -130,10 +160,15 @@ public class JPDeleteReserva extends javax.swing.JPanel {
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setBorder(null);
         btnLimpiar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("$");
 
-        spinFechaViaje.setModel(new javax.swing.SpinnerDateModel());
+        spinFechaViaje.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(1750755059126L), null, null, java.util.Calendar.DAY_OF_MONTH));
 
         jLabel3.setText("Fecha de viaje");
 
@@ -151,25 +186,23 @@ public class JPDeleteReserva extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(txtPrecioTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(spinFechaViaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbClase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(spinDuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(spinDuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(txtPrecioTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cmbClase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,7 +222,7 @@ public class JPDeleteReserva extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtPrecioTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addGap(18, 18, Short.MAX_VALUE)
+                .addGap(18, 19, Short.MAX_VALUE)
                 .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -217,29 +250,40 @@ public class JPDeleteReserva extends javax.swing.JPanel {
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
 
-        txtBusqueda4.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
-        txtBusqueda4.setMinimumSize(new java.awt.Dimension(200, 50));
-        txtBusqueda4.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbBusqueda.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
+        cmbBusqueda.setMinimumSize(new java.awt.Dimension(64, 39));
+        cmbBusqueda.setPreferredSize(new java.awt.Dimension(200, 50));
+        cmbBusqueda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbBusquedaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(txtBusqueda4, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap(378, Short.MAX_VALUE)
                 .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGap(16, 16, 16)
+                    .addComponent(cmbBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(65, Short.MAX_VALUE)))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtBusqueda4, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(12, 12, 12)
+                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(7, Short.MAX_VALUE))
+            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(cmbBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -266,12 +310,166 @@ public class JPDeleteReserva extends javax.swing.JPanel {
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
+           Reserva reservaSeleccionada = (Reserva) cmbBusqueda.getSelectedItem();
+           if (reservaSeleccionada == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona una reserva para eliminar.");
+            return;
+        }
+
+        try {
+             // o como corresponda
+
+            controlador.eliminarReservaLogica(reservaSeleccionada.getId());
+
+            JOptionPane.showMessageDialog(this, "Reserva eliminada correctamente.");
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al eliminar la reserva: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private int obtenerClienteIdDesdeCombo() {
+        String nombreCliente = cmbCliente.getSelectedItem().toString();
+    
+    return controlador.buscarClienteIdPorNombre(nombreCliente);
+    }
+    private void actualizarPrecioTotal() {
+        if (cmbOrigen.getSelectedItem() != null && cmbDestino.getSelectedItem() != null) {
+            String origen = cmbOrigen.getSelectedItem().toString();
+            String destino = cmbDestino.getSelectedItem().toString();
+
+            double precio = controlador.obtenerPrecio(origen, destino);
+
+            txtPrecioTotal.setText(String.valueOf(precio));
+        }
+    }
+    private void cmbBusquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbBusquedaActionPerformed
+        // TODO add your handling code here:
+        Reserva reservaSeleccionada = (Reserva) cmbBusqueda.getSelectedItem();
+
+        if (reservaSeleccionada != null) {
+            // Aquí llamas a un método para obtener todos los datos de esa reserva
+            Reserva r = controlador.obtenerReservaPorId(reservaSeleccionada.getId());
+
+            if (r != null) {
+                cmbOrigen.setSelectedItem(r.getOrigen());
+                cmbDestino.setSelectedItem(r.getDestino());
+                cmbCliente.setSelectedItem(r.getNombres_apellidos()); // O usa ID si tienes
+                cmbClase.setSelectedItem(r.getClase());
+                txtPrecioTotal.setText(String.valueOf(r.getPrecio_total()));
+                spinFechaViaje.setValue(r.getFecha_viaje());
+                spinDuracion.setValue(r.getCantidad_pasajeros()); // o duración si tienes otro campo
+            }
+        }
+        System.out.println("Seleccionado: " + reservaSeleccionada.getId());
+    }//GEN-LAST:event_cmbBusquedaActionPerformed
+    private void limpiarCampos() {
+        cmbOrigen.setSelectedIndex(-1);
+        cmbDestino.setSelectedIndex(-1);
+        cmbCliente.setSelectedIndex(-1);
+        cmbClase.setSelectedIndex(-1);
+        cmbBusqueda.setSelectedIndex(-1);
+
+        txtPrecioTotal.setText("");
+
+        spinFechaViaje.setValue(new java.util.Date()); // fecha actual
+        spinDuracion.setValue(1); // o el valor mínimo que tengas definido
+    }
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // TODO add your handling code here:
+        limpiarCampos();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+    private void cmbOrigenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbOrigenActionPerformed
+        // TODO add your handling code here:
+        actualizarPrecioTotal();
+    }//GEN-LAST:event_cmbOrigenActionPerformed
+
+    private void cmbDestinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbDestinoActionPerformed
+        // TODO add your handling code here:
+        actualizarPrecioTotal();
+    }//GEN-LAST:event_cmbDestinoActionPerformed
+    private void cargarCmbBusqueda () {
+        
+
+        cmbBusqueda.removeAllItems();
+        for (Reserva r : reservas) {
+            cmbBusqueda.addItem(r);
+        }
+
+    }
+    private void cargarPaises() {
+        String[] paises = {"Ecuador", "Perú", "México"};
+
+        cmbOrigen.removeAllItems();
+        cmbDestino.removeAllItems();
+
+        for (String pais : paises) {
+            cmbOrigen.addItem(pais);
+            cmbDestino.addItem(pais);
+        }
+    }
+    private Map<String, Integer> clientesMap = new HashMap<>();
+
+    private void cargarClientes() {
+        clientesMap = controlador.obtenerClientesConId();
+        cmbCliente.removeAllItems();
+
+        for (String nombre : clientesMap.keySet()) {
+            cmbCliente.addItem(nombre);
+        }
+    }
+    private void cargarClases() {
+        cmbClase.removeAllItems(); // Limpia elementos anteriores
+        cmbClase.addItem("Económica");
+        cmbClase.addItem("Ejecutiva");
+        cmbClase.addItem("Primera");
+    }
+    private void calcularPrecioTotal(Controlador controlador) {
+        String origen = (String) cmbOrigen.getSelectedItem();
+        String destino = (String) cmbDestino.getSelectedItem();
+
+        if (origen == null || destino == null || origen.equals(destino)) {
+            txtPrecioTotal.setText("0.00");
+            return;
+        }
+
+        String claveRuta = origen + "-" + destino;
+
+        Double precioBase = controlador.obtenerPrecio(origen, destino); // Usamos método del controlador
+        if (precioBase == null || precioBase == 0) {
+            txtPrecioTotal.setText("0.00");
+            return;
+        }
+
+        int cantidad = (Integer) spinDuracion.getValue();
+        double total = precioBase * cantidad;
+        txtPrecioTotal.setText(String.format("%.2f", total));
+    }
+    private void configurarEventos() {
+    
+
+        ItemListener recalcular = e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                calcularPrecioTotal(controlador);
+            }
+        };
+
+        ChangeListener cambioPasajeros = e -> calcularPrecioTotal(controlador);
+
+        cmbOrigen.addItemListener(recalcular);
+        cmbDestino.addItemListener(recalcular);
+        spinDuracion.addChangeListener(cambioPasajeros);
+    }
+
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnLimpiar;
+    private javax.swing.JComboBox<Reserva> cmbBusqueda;
     private javax.swing.JComboBox<String> cmbClase;
     private javax.swing.JComboBox<String> cmbCliente;
     private javax.swing.JComboBox<String> cmbDestino;
@@ -287,7 +485,6 @@ public class JPDeleteReserva extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JSpinner spinDuracion;
     private javax.swing.JSpinner spinFechaViaje;
-    private javax.swing.JTextField txtBusqueda4;
     private javax.swing.JTextField txtPrecioTotal;
     // End of variables declaration//GEN-END:variables
 }

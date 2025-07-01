@@ -5,18 +5,35 @@
 package capaPresentacion.PaquetesTuristicos;
 
 import capaPresentacion.Usuario.*;
+import javax.swing.JOptionPane;
+import entidades.PaqueteTuristico;
+import capaNegocio.Controlador;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.SpinnerDateModel;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  *
  * @author Juan magallanes
  */
 public class JPEditPaquete extends javax.swing.JPanel {
-
+    
+    Controlador controlador = new Controlador();
     /**
      * Creates new form JPCreate
      */
     public JPEditPaquete() {
         initComponents();
+        cargarPaises();
+        cargarHospedajes();
+        cargarActividades();
+        cargarTransportes() ;
     }
 
     /**
@@ -31,7 +48,7 @@ public class JPEditPaquete extends javax.swing.JPanel {
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         txtNombre = new javax.swing.JTextField();
-        btnGuardar = new javax.swing.JButton();
+        btnModificar = new javax.swing.JButton();
         cmbHospedaje = new javax.swing.JComboBox<>();
         cmbTransporte = new javax.swing.JComboBox<>();
         spinDuracion = new javax.swing.JSpinner();
@@ -64,14 +81,14 @@ public class JPEditPaquete extends javax.swing.JPanel {
         txtNombre.setMinimumSize(new java.awt.Dimension(200, 50));
         txtNombre.setPreferredSize(new java.awt.Dimension(200, 50));
 
-        btnGuardar.setBackground(new java.awt.Color(102, 102, 102));
-        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
-        btnGuardar.setText("Guardar");
-        btnGuardar.setBorder(null);
-        btnGuardar.setPreferredSize(new java.awt.Dimension(190, 40));
-        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+        btnModificar.setBackground(new java.awt.Color(102, 102, 102));
+        btnModificar.setForeground(new java.awt.Color(255, 255, 255));
+        btnModificar.setText("Modificar");
+        btnModificar.setBorder(null);
+        btnModificar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnModificar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarActionPerformed(evt);
+                btnModificarActionPerformed(evt);
             }
         });
 
@@ -89,7 +106,7 @@ public class JPEditPaquete extends javax.swing.JPanel {
 
         jLabel2.setText("Duracion");
 
-        spinFechaInicio.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(1750755035075L), null, null, java.util.Calendar.DAY_OF_MONTH));
+        spinFechaInicio.setModel(new javax.swing.SpinnerDateModel());
 
         jLabel3.setText("Fecha de inicio");
 
@@ -114,7 +131,7 @@ public class JPEditPaquete extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnGuardar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnModificar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -140,7 +157,7 @@ public class JPEditPaquete extends javax.swing.JPanel {
                     .addComponent(spinFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
                 .addGap(12, 12, 12)
-                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnModificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -162,12 +179,17 @@ public class JPEditPaquete extends javax.swing.JPanel {
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setBorder(null);
         btnLimpiar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         cmbActividades.setBorder(javax.swing.BorderFactory.createTitledBorder("Actividades"));
         cmbActividades.setMinimumSize(new java.awt.Dimension(64, 39));
         cmbActividades.setPreferredSize(new java.awt.Dimension(200, 50));
 
-        spinFechaFin.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(1750755035075L), null, null, java.util.Calendar.DAY_OF_MONTH));
+        spinFechaFin.setModel(new javax.swing.SpinnerDateModel());
 
         jLabel4.setText("Fecha fin");
 
@@ -245,6 +267,12 @@ public class JPEditPaquete extends javax.swing.JPanel {
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
 
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         txtBusqueda.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
         txtBusqueda.setMinimumSize(new java.awt.Dimension(200, 50));
         txtBusqueda.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -284,21 +312,174 @@ public class JPEditPaquete extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addGap(0, 15, Short.MAX_VALUE)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+    
+    
+    private void cargarPaises() {
+        String[] paises = {"Ecuador", "Perú", "México"};
+
+        
+        cmbDestino.removeAllItems();
+
+        for (String pais : paises) {
+            
+            cmbDestino.addItem(pais);
+        }
+    }
+    
+    private void cargarActividades() {
+    cmbActividades.removeAllItems();
+    cmbActividades.addItem("Tour histórico");
+    cmbActividades.addItem("Caminata ecológica");
+    cmbActividades.addItem("Snorkel");
+    cmbActividades.addItem("Escalada");
+    cmbActividades.addItem("Tour gastronómico");
+}
+
+private void cargarTransportes() {
+    
+    List<String> transportes = controlador.obtenerTransportesDisponibles();
+
+    cmbTransporte.removeAllItems();
+    for (String t : transportes) {
+        cmbTransporte.addItem(t);
+    }
+}
+    
+
+private Map<String, Double> preciosHospedaje = new HashMap<>();
+private void cargarHospedajes() {
+    preciosHospedaje.clear();
+    cmbHospedaje.removeAllItems();
+
+    preciosHospedaje.put("Hotel 3 estrellas", 50.0);
+    preciosHospedaje.put("Hotel 5 estrellas", 120.0);
+    preciosHospedaje.put("Hostal", 30.0);
+    preciosHospedaje.put("Cabaña", 70.0);
+    preciosHospedaje.put("Resort", 150.0);
+
+    for (String nombre : preciosHospedaje.keySet()) {
+        cmbHospedaje.addItem(nombre);
+    }
+}
+    private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarActionPerformed
+     try {
+        PaqueteTuristico paquete = new PaqueteTuristico();
+
+        paquete.setNombrePaquete(txtNombre.getText().trim());
+        paquete.setDestino((String) cmbDestino.getSelectedItem());
+        paquete.setPrecioDestino(Double.parseDouble(txtPrecio.getText().trim()));
+        paquete.setHospedaje((String) cmbHospedaje.getSelectedItem());
+
+        // Extraer la placa desde el combo (ej: "Bus - ABC123")
+        String transporteSeleccionado = (String) cmbTransporte.getSelectedItem();
+        if (transporteSeleccionado != null && transporteSeleccionado.contains(" - ")) {
+            String placa = transporteSeleccionado.substring(transporteSeleccionado.lastIndexOf(" - ") + 3);
+            paquete.setTransportePlaca(placa);
+        } else {
+            paquete.setTransportePlaca(null); // o puedes lanzar un error si es obligatorio
+        }
+
+        paquete.setActividades((String) cmbActividades.getSelectedItem());
+        paquete.setDuracionDias((Integer) spinDuracion.getValue());
+
+        // Convertir fecha de spinner a String con formato
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        paquete.setFechaInicio(sdf.format((Date) spinFechaInicio.getValue()));
+        paquete.setFechaFin(sdf.format((Date) spinFechaFin.getValue()));
+
+        paquete.setPrecioTotal(Double.parseDouble(txtPrecioTotal.getText().trim()));
+
+        // Llamar al controlador para actualizar
+        controlador.modificarPaqueteTuristico(paquete);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al modificar los datos. Verifique los campos.", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnModificarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        
+         String nombre = txtBusqueda.getText().trim();
+    if (nombre.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Ingrese el nombre del paquete para buscar", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    PaqueteTuristico paquete = controlador.buscarPaquetePorNombre(nombre);
+    if (paquete != null) {
+        txtNombre.setText(paquete.getNombrePaquete());
+        cmbDestino.setSelectedItem(paquete.getDestino());
+        txtPrecio.setText(String.valueOf(paquete.getPrecioDestino()));
+        cmbHospedaje.setSelectedItem(paquete.getHospedaje());
+        cmbTransporte.setSelectedItem(paquete.getTransportePlaca());
+        cmbActividades.setSelectedItem(paquete.getActividades());
+        spinDuracion.setValue(paquete.getDuracionDias());
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+    String fechaOriginal = paquete.getFechaInicio(); // "Mon Jun 30 22:59:16 ECT 2025"
+    
+    // Parsear la fecha con formato y locale inglés
+    SimpleDateFormat sdfEntrada = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+    Date fechaParseada = (Date) sdfEntrada.parse(fechaOriginal);
+    
+    // Asignar la fecha al JSpinner
+    spinFechaInicio.setValue(fechaParseada);
+    
+    // Igual para fecha fin:
+    fechaOriginal = paquete.getFechaFin();
+    Date fechaFinParseada = (Date) sdfEntrada.parse(fechaOriginal);
+    spinFechaFin.setValue(fechaFinParseada);
+    
+} catch (ParseException e) {
+    e.printStackTrace();
+    JOptionPane.showMessageDialog(null, "Error al convertir fechas", "ERROR", JOptionPane.ERROR_MESSAGE);
+}
+
+
+
+    txtPrecioTotal.setText(String.valueOf(paquete.getPrecioTotal()));
+        
+    } else {
+        JOptionPane.showMessageDialog(null, "Paquete no encontrado", "AVISO", JOptionPane.WARNING_MESSAGE);
+    }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // TODO add your handling code here:
+        limpiarFormulario() ;
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+private void limpiarFormulario() {
+    txtNombre.setText("");
+    cmbDestino.setSelectedIndex(-1);
+    txtPrecio.setText("");
+    cmbHospedaje.setSelectedIndex(-1);
+    cmbTransporte.setSelectedIndex(-1);
+    cmbActividades.setSelectedIndex(-1);
+    spinDuracion.setValue(1); // o el valor por defecto que uses
+    txtPrecioTotal.setText("");
+
+    // Si los spinners tienen modelos de fecha
+    spinFechaInicio.setValue(new java.util.Date());
+    spinFechaFin.setValue(new java.util.Date());
+
+    txtBusqueda.setText("");
+}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
+    private javax.swing.JButton btnModificar;
     private javax.swing.JComboBox<String> cmbActividades;
     private javax.swing.JComboBox<String> cmbDestino;
     private javax.swing.JComboBox<String> cmbHospedaje;

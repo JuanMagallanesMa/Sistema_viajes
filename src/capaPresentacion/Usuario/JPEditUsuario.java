@@ -4,12 +4,16 @@
  */
 package capaPresentacion.Usuario;
 
+import capaNegocio.Controlador;
+import javax.swing.JOptionPane;
+import entidades.Usuario;
+
 /**
  *
  * @author Juan magallanes
  */
 public class JPEditUsuario extends javax.swing.JPanel {
-
+    private int idUsuario = -1;
     /**
      * Creates new form JPDeleteUsuario
      */
@@ -177,6 +181,12 @@ public class JPEditUsuario extends javax.swing.JPanel {
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
 
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         txtBusqueda.setBorder(javax.swing.BorderFactory.createTitledBorder("Busqueda"));
         txtBusqueda.setMinimumSize(new java.awt.Dimension(200, 50));
         txtBusqueda.setPreferredSize(new java.awt.Dimension(200, 50));
@@ -245,12 +255,82 @@ public class JPEditUsuario extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+        guardarUsuario();// TODO add your handling code here:
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void cmbRolesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbRolesActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbRolesActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        buscarUsuarioPorCedula();// TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+private void buscarUsuarioPorCedula() {
+    String cedula = txtBusqueda.getText().trim();
+    if (cedula.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Ingrese una cédula para buscar.");
+        return;
+    }
+
+    Controlador controlador = new Controlador();
+    Usuario user = controlador.obtenerUsuarioPorCedula(cedula);
+
+    if (user != null) {
+        idUsuario = user.getId();
+        txtCedula.setText(user.getCedula());
+        txtNombresCompletos.setText(user.getNombreCompleto());
+        txtCorreoElectronico.setText(user.getCorreoElectronico());
+        txtTelefono.setText(user.getTelefono());
+        txtDireccion.setText(user.getDireccion());
+        txtUsuario.setText(user.getNombreUsuario());
+        txtContrasena.setText(user.getContrasena());
+        cmbRoles.setSelectedItem(user.getRol());
+    } else {
+        JOptionPane.showMessageDialog(this, "Usuario no encontrado con esa cédula.");
+    }
+}
+private void guardarUsuario() {
+    Usuario user = new Usuario();
+    user.setCedula(txtCedula.getText().trim());
+    user.setNombreCompleto(txtNombresCompletos.getText().trim());
+    user.setCorreoElectronico(txtCorreoElectronico.getText().trim());
+    user.setTelefono(txtTelefono.getText().trim());
+    user.setDireccion(txtDireccion.getText().trim());
+    user.setRol((String) cmbRoles.getSelectedItem());
+    user.setNombreUsuario(txtUsuario.getText().trim());
+    user.setContrasena(txtContrasena.getText().trim());
+    user.setFechaRegistro(new java.sql.Timestamp(System.currentTimeMillis()));
+    user.setEstado("Activo");
+
+    Controlador controlador = new Controlador();
+
+    if (idUsuario == -1) {
+        // INSERTAR
+        controlador.insertarUsuario(user);
+    } else {
+        // MODIFICAR
+        user.setId(idUsuario);
+        controlador.modificarUsuario(user);
+    }
+
+    limpiarCampos(); // opcional
+}
+
+private void limpiarCampos() {
+    txtCedula.setText("");
+    txtNombresCompletos.setText("");
+    txtCorreoElectronico.setText("");
+    txtTelefono.setText("");
+    txtDireccion.setText("");
+    txtUsuario.setText("");
+    txtContrasena.setText("");
+    cmbRoles.setSelectedIndex(0);
+    idUsuario = -1;
+}
+
+
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

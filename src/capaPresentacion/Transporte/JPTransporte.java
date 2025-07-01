@@ -17,6 +17,7 @@ public class JPTransporte extends javax.swing.JPanel {
     JPCreateTransporte crear = new JPCreateTransporte();
     JPDeleteTransporte eliminar = new JPDeleteTransporte();
     JPEditTransporte editar = new JPEditTransporte();
+    JPReporteTransporte reporte = new JPReporteTransporte();
     /**
      * Creates new form JPUsuario
      */
@@ -157,6 +158,13 @@ public class JPTransporte extends javax.swing.JPanel {
 
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
         // TODO add your handling code here:
+        panelContenedor.removeAll();
+        
+        panelContenedor.setLayout(new BorderLayout());
+        panelContenedor.add(reporte, BorderLayout.CENTER);
+        
+        panelContenedor.revalidate();
+        panelContenedor.repaint();
     }//GEN-LAST:event_btnReporteActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed

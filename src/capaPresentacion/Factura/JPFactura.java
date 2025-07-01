@@ -17,6 +17,7 @@ public class JPFactura extends javax.swing.JPanel {
     
     JPCreateFactura crear = new JPCreateFactura();
     JPDeleteFactura eliminar = new JPDeleteFactura();
+    JPReporteFactura reporte = new JPReporteFactura();
     
     /**
      * Creates new form JPUsuario
@@ -146,7 +147,13 @@ public class JPFactura extends javax.swing.JPanel {
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
-        // TODO add your handling code here:
+         panelContenedor.removeAll();
+        
+        panelContenedor.setLayout(new BorderLayout());
+        panelContenedor.add(reporte, BorderLayout.CENTER);
+        
+        panelContenedor.revalidate();
+        panelContenedor.repaint();// TODO add your handling code here:
     }//GEN-LAST:event_btnReporteActionPerformed
 
 
