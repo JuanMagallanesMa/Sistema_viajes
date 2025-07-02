@@ -105,12 +105,12 @@ public class JPReporteCliente extends javax.swing.JPanel {
         for (Cliente c : lista) {
             modelo.addRow(new Object[]{
                 c.getId(),
-                c.getNombres_apellidos(),
-                c.getCorreoelectronico(),
+                c.getNombreCompleto(),
+                c.getCorreoElectronico(),
                 c.getDireccion(),
                 c.getTelefono(),
                 c.getCedula(),
-                c.getFecha_registro()
+                c.getFechaRegistro()
             });
         }
     }

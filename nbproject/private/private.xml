@@ -4,9 +4,12 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/capaNegocio/Controlador.java</file>
-            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/entidades/PaqueteTuristico.java</file>
-            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/capaPresentacion/PaquetesTuristicos/JPReportePaquete.java</file>
-            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/capaPresentacion/PaquetesTuristicos/JPPaquete.java</file>
+            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/capaPresentacion/PaquetesTuristicos/JPCreatePaquete.java</file>
+            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/entidades/Persona.java</file>
+            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/entidades/Cliente.java</file>
+            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/entidades/Usuario.java</file>
+            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/capaPresentacion/Cliente/JPReporteCliente.java</file>
+            <file>file:/C:/Users/luis%20magallanes/Documents/NetBeansProjects/Verificacion_Proyecto/Sistema_de_viajes/src/entidades/Reserva.java</file>
         </group>
     </open-files>
 </project-private>

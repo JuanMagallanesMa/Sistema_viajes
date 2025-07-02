@@ -104,12 +104,12 @@ public class Controlador {
             while (rs.next()) {
                 Cliente c = new Cliente();
                 c.setId(rs.getInt("id"));
-                c.setNombres_apellidos(rs.getString("nombres_apellidos"));
-                c.setCorreoelectronico(rs.getString("correoelectronico"));
+                c.setNombreCompleto(rs.getString("nombres_apellidos"));
+                c.setCorreoElectronico(rs.getString("correoelectronico"));
                 c.setDireccion(rs.getString("direccion"));
                 c.setTelefono(rs.getString("telefono"));
                 c.setCedula(rs.getString("cedula"));
-                c.setFecha_registro(rs.getTimestamp("fecha_registro"));
+                c.setFechaRegistro(rs.getTimestamp("fecha_registro"));
                 lista.add(c);
             }
         } catch (Exception e) {
@@ -122,12 +122,12 @@ public class Controlador {
         try {
             Connection cone = getConexion();
             PreparedStatement pst = cone.prepareStatement("INSERT INTO cliente (nombres_apellidos, correoelectronico, direccion, telefono, cedula, fecha_registro) VALUES(?,?,?,?,?,?)");
-            pst.setString(1, cli.getNombres_apellidos());
-            pst.setString(2, cli.getCorreoelectronico());
+            pst.setString(1, cli.getNombreCompleto());
+            pst.setString(2, cli.getCorreoElectronico());
             pst.setString(3, cli.getDireccion());
             pst.setString(4, cli.getTelefono());
             pst.setString(5, cli.getCedula());
-            pst.setTimestamp(6, cli.getFecha_registro());
+            pst.setTimestamp(6, cli.getFechaRegistro());
             pst.executeUpdate();
         JOptionPane.showMessageDialog(null, "Guardado correctamente", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
 
@@ -143,8 +143,8 @@ public class Controlador {
 
             String sql = "UPDATE cliente SET nombres_apellidos=?, correoelectronico=?, direccion=?, telefono=?, cedula=? WHERE id=?";
             PreparedStatement pst = cone.prepareStatement(sql);
-            pst.setString(1, cli.getNombres_apellidos());
-            pst.setString(2, cli.getCorreoelectronico());
+            pst.setString(1, cli.getNombreCompleto());
+            pst.setString(2, cli.getCorreoElectronico());
             pst.setString(3, cli.getDireccion());
             pst.setString(4, cli.getTelefono());
             pst.setString(5, cli.getCedula());
@@ -770,7 +770,7 @@ public ArrayList<Factura> obtenerFacturasReporte(Date fechaInicio, Date fechaFin
             if (rs.next()) {
                 cliente = new Cliente();
                 cliente.setId(rs.getInt("id")); // ID del cliente
-                cliente.setNombres_apellidos(rs.getString("nombres_apellidos"));
+                cliente.setNombreCompleto(rs.getString("nombres_apellidos"));
                 cliente.setCedula(rs.getString("cedula"));
             }
         } catch (SQLException ex) {
@@ -849,12 +849,12 @@ public ArrayList<Factura> obtenerFacturasReporte(Date fechaInicio, Date fechaFin
             while (resul.next()) {
                 Cliente c = new Cliente();
                 c.setId(resul.getInt("id"));
-                c.setNombres_apellidos(resul.getString("nombres_apellidos"));
-                c.setCorreoelectronico(resul.getString("correoelectronico"));
+                c.setNombreCompleto(resul.getString("nombres_apellidos"));
+                c.setCorreoElectronico(resul.getString("correoelectronico"));
                 c.setDireccion(resul.getString("direccion"));
                 c.setTelefono(resul.getString("telefono"));
                 c.setCedula(resul.getString("cedula"));
-                c.setFecha_registro(resul.getTimestamp("fecha_registro"));
+                c.setFechaRegistro(resul.getTimestamp("fecha_registro"));
 
                 client.add(c);
             }
