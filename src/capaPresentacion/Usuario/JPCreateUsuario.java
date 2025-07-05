@@ -258,6 +258,8 @@ private void limpiarCampos() {
     txtUsuario.setText("");
     txtContrasena.setText("");
     cmbRoles.setSelectedIndex(0);
+    
+    txtCedula.requestFocus();
 }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;

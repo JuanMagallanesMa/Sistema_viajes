@@ -250,10 +250,10 @@ private Cliente clienteActual;
 
             if (clienteActual != null) {
                 txtCedula.setText(clienteActual.getCedula());
-                txtNombresCompletos.setText(clienteActual.getNombres_apellidos());
+                txtNombresCompletos.setText(clienteActual.getNombreCompleto());
                 txtDireccion.setText(clienteActual.getDireccion());
                 txtTelefono.setText(clienteActual.getTelefono());
-                txtCorreoElectronico.setText(clienteActual.getCorreoelectronico());
+                txtCorreoElectronico.setText(clienteActual.getCorreoElectronico());
             } else {
                 JOptionPane.showMessageDialog(null, "Cliente no encontrado");
                 // Limpiar campos si se desea

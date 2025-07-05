@@ -299,6 +299,7 @@ private void limpiarCampos() {
     txtContrasena.setText("");
     cmbRoles.setSelectedIndex(0);
     idUsuario = -1;
+    txtBusqueda.setText("");
 }
 
 private void eliminarUsuarioActual() {

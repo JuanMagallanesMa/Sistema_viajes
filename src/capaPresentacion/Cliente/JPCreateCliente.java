@@ -118,6 +118,11 @@ public class JPCreateCliente extends javax.swing.JPanel {
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setBorder(null);
         btnLimpiar.setPreferredSize(new java.awt.Dimension(190, 40));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -183,15 +188,25 @@ public class JPCreateCliente extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        txtNombresCompletos.setText("");
+        txtCedula.setText("");
+        txtTelefono.setText("");
+        txtDireccion.setText("");
+        txtCorreoElectronico.setText("");
+
+        txtNombresCompletos.requestFocus();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
     private void guardarCliente() {
         try {
             Cliente cli = new Cliente();
-            cli.setNombres_apellidos(txtNombresCompletos.getText());
+            cli.setNombreCompleto(txtNombresCompletos.getText());
             cli.setDireccion(txtDireccion.getText());
             cli.setTelefono(txtTelefono.getText());
             cli.setCedula(txtCedula.getText());
-            cli.setCorreoelectronico(txtCorreoElectronico.getText()); // Si tienes un campo de correo, reemplaza esto
-            cli.setFecha_registro(Timestamp.valueOf(LocalDateTime.now())); // Fecha actual
+            cli.setCorreoElectronico(txtCorreoElectronico.getText()); // Si tienes un campo de correo, reemplaza esto
+            cli.setFechaRegistro(Timestamp.valueOf(LocalDateTime.now())); // Fecha actual
 
             Controlador controlador = new Controlador(); // o el nombre de tu clase real
             controlador.InsertarCliente(cli);
